@@ -1,8 +1,10 @@
 (function () {
-  const PHOTO_NUMBERS = [1, 2, 3, 4, 11, 12, 13, 14, 15, 31, 32, 42, 43, 44, 45, 46, 50, 51, 100];
-  const photos = PHOTO_NUMBERS.map((n) => `images/File_${n}.png`);
+  const PHOTO_COUNT = 19;
+  const photos = Array.from({ length: PHOTO_COUNT }, (_, i) =>
+    `images/File_${String(i).padStart(3, "0")}.png`
+  );
 
-  const ADU_PHOTO_COUNT = 7;
+  const ADU_PHOTO_COUNT = 6;
   const aduPhotos = Array.from({ length: ADU_PHOTO_COUNT }, (_, i) =>
     `images/ADU_${String(i + 1).padStart(2, "0")}.png`
   );
