@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>7339 Alabama Ave, Canoga Park, CA | For Sale by Owner</title>
+<meta name="description" content="3 bed / 2 bath home for sale in Canoga Park, CA. 1,500 sqft, 2-car garage, built 1960. Close to schools, parks, and transit. Asking $870,000.">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="container header-inner">
+    <span class="logo">7339 Alabama Ave</span>
+    <a href="#contact" class="btn btn-small">Contact</a>
+  </div>
+</header>
+
+<section class="hero" style="background-image: linear-gradient(rgba(20,20,20,0.35), rgba(20,20,20,0.55)), url('images/File_025.png');">
+  <div class="hero-content">
+    <p class="hero-eyebrow">For Sale by Owner</p>
+    <h1>7339 Alabama Ave</h1>
+    <p class="hero-address">Canoga Park, CA 91303</p>
+    <p class="hero-price">$870,000</p>
+    <a href="#contact" class="btn btn-primary">Request a Showing</a>
+  </div>
+</section>
+
+<section class="stats">
+  <div class="container stats-grid">
+    <div class="stat-tile">
+      <span class="stat-number">3</span>
+      <span class="stat-label">Bedrooms</span>
+    </div>
+    <div class="stat-tile">
+      <span class="stat-number">2</span>
+      <span class="stat-label">Bathrooms</span>
+    </div>
+    <div class="stat-tile">
+      <span class="stat-number">1,500</span>
+      <span class="stat-label">Sq. Ft.</span>
+    </div>
+    <div class="stat-tile">
+      <span class="stat-number">2-Car</span>
+      <span class="stat-label">Garage</span>
+    </div>
+    <div class="stat-tile">
+      <span class="stat-number">1960</span>
+      <span class="stat-label">Year Built</span>
+    </div>
+  </div>
+</section>
+
+<section class="description">
+  <div class="container narrow">
+    <h2>About This Home</h2>
+    <p>Welcome to 7339 Alabama Ave, a well-kept 3 bedroom, 2 bathroom home in the heart of Canoga Park. With 1,500 square feet of living space, the home offers a bright, updated kitchen with a center island and stainless appliances, a comfortable living room for gathering, and generously sized bedrooms with plenty of natural light.</p>
+    <p>The bathrooms feature modern vanities and finishes, and the home includes a 2-car garage for parking and storage. Set on a quiet residential street, this property is close to schools, parks, and convenient transit &mdash; making it easy to get around while enjoying a peaceful neighborhood setting.</p>
+    <p>Take a look through the photo gallery below to see everything this home has to offer, and reach out using the contact form to schedule a showing.</p>
+  </div>
+</section>
+
+<section class="gallery-section">
+  <div class="container">
+    <h2>Photo Gallery</h2>
+    <div id="gallery" class="gallery-grid"></div>
+  </div>
+</section>
+
+<div id="lightbox" class="lightbox">
+  <button class="lightbox-close" aria-label="Close">&times;</button>
+  <button class="lightbox-prev" aria-label="Previous">&#10094;</button>
+  <img id="lightbox-img" src="" alt="Property photo">
+  <button class="lightbox-next" aria-label="Next">&#10095;</button>
+</div>
+
+<section class="location">
+  <div class="container">
+    <h2>Location &amp; Neighborhood</h2>
+    <p>Located in Canoga Park, this home is close to schools, parks, and convenient transit.</p>
+    <div class="map-wrapper">
+      <iframe
+        title="Map of 7339 Alabama Ave, Canoga Park, CA 91303"
+        src="https://www.google.com/maps?q=7339+Alabama+Ave,+Canoga+Park,+CA+91303&output=embed"
+        loading="lazy"
+        referrerpolicy="no-referrer-when-downgrade">
+      </iframe>
+    </div>
+  </div>
+</section>
+
+<section id="contact" class="contact">
+  <div class="container narrow">
+    <h2>Interested in This Home?</h2>
+    <p>Fill out the form below and the owner will get back to you directly.</p>
+    <form id="contact-form" action="https://formspree.io/f/YOUR_FORM_ID" method="POST">
+      <div class="form-row">
+        <label for="name">Name</label>
+        <input type="text" id="name" name="name" required>
+      </div>
+      <div class="form-row">
+        <label for="email">Email</label>
+        <input type="email" id="email" name="email" required>
+      </div>
+      <div class="form-row">
+        <label for="phone">Phone (optional)</label>
+        <input type="tel" id="phone" name="phone">
+      </div>
+      <div class="form-row">
+        <label for="message">Message</label>
+        <textarea id="message" name="message" rows="5" required placeholder="I'd like to schedule a showing..."></textarea>
+      </div>
+      <button type="submit" class="btn btn-primary">Send Message</button>
+      <p id="form-status" class="form-status"></p>
+    </form>
+  </div>
+</section>
+
+<footer class="site-footer">
+  <div class="container">
+    <p>7339 Alabama Ave, Canoga Park, CA 91303</p>
+    <p class="disclaimer">For Sale by Owner. Information deemed reliable but not guaranteed; buyer to verify all details independently.</p>
+    <p class="copyright">&copy; 2026 7339 Alabama Ave</p>
+  </div>
+</footer>
+
+<script src="script.js"></script>
+</body>
+</html>
