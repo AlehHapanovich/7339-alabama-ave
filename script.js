@@ -1,7 +1,10 @@
 (function () {
-  const PHOTO_COUNT = 34;
-  const photos = Array.from({ length: PHOTO_COUNT }, (_, i) =>
-    `images/File_${String(i).padStart(3, "0")}.png`
+  const PHOTO_NUMBERS = [1, 2, 3, 4, 11, 12, 13, 14, 15, 31, 32, 42, 43, 44, 45, 46, 50, 51, 100];
+  const photos = PHOTO_NUMBERS.map((n) => `images/File_${n}.png`);
+
+  const ADU_PHOTO_COUNT = 7;
+  const aduPhotos = Array.from({ length: ADU_PHOTO_COUNT }, (_, i) =>
+    `images/ADU_${String(i + 1).padStart(2, "0")}.png`
   );
 
   /* Slider */
@@ -21,7 +24,7 @@
 
   document.querySelector(".slider-prev").addEventListener("click", () => moveSlider(-1));
   document.querySelector(".slider-next").addEventListener("click", () => moveSlider(1));
-  sliderImg.addEventListener("click", () => openLightbox(sliderIndex));
+  sliderImg.addEventListener("click", () => openLightbox(photos, sliderIndex));
   renderSlider();
 
   /* Grid + expand toggle */
@@ -53,7 +56,25 @@
 
   galleryEl.addEventListener("click", (e) => {
     if (e.target.tagName === "IMG") {
-      openLightbox(Number(e.target.dataset.index));
+      openLightbox(photos, Number(e.target.dataset.index));
+    }
+  });
+
+  /* ADU grid */
+  const aduGridEl = document.getElementById("adu-grid");
+
+  aduPhotos.forEach((src, index) => {
+    const img = document.createElement("img");
+    img.src = src;
+    img.alt = `ADU photo ${index + 1}`;
+    img.loading = "lazy";
+    img.dataset.index = index;
+    aduGridEl.appendChild(img);
+  });
+
+  aduGridEl.addEventListener("click", (e) => {
+    if (e.target.tagName === "IMG") {
+      openLightbox(aduPhotos, Number(e.target.dataset.index));
     }
   });
 
@@ -61,14 +82,16 @@
   const lightbox = document.getElementById("lightbox");
   const lightboxImg = document.getElementById("lightbox-img");
   const lightboxCounter = document.getElementById("lightbox-counter");
+  let activeSet = photos;
   let currentIndex = 0;
 
   function renderLightbox() {
-    lightboxImg.src = photos[currentIndex];
-    lightboxCounter.textContent = `${currentIndex + 1} / ${photos.length}`;
+    lightboxImg.src = activeSet[currentIndex];
+    lightboxCounter.textContent = `${currentIndex + 1} / ${activeSet.length}`;
   }
 
-  function openLightbox(index) {
+  function openLightbox(set, index) {
+    activeSet = set;
     currentIndex = index;
     renderLightbox();
     lightbox.classList.add("open");
@@ -80,7 +103,7 @@
   }
 
   function showRelative(delta) {
-    currentIndex = (currentIndex + delta + photos.length) % photos.length;
+    currentIndex = (currentIndex + delta + activeSet.length) % activeSet.length;
     renderLightbox();
   }
 

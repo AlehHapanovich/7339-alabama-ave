@@ -216,6 +216,17 @@ h1, h2 {
 
 .photos-section h2 { margin-bottom: 24px; }
 
+/* ADU */
+.adu-section {
+  padding: 0 0 56px;
+}
+
+.adu-intro {
+  color: var(--color-text-muted);
+  max-width: 760px;
+  margin: 0 0 24px;
+}
+
 .slider {
   position: relative;
   background: #000;
@@ -274,6 +285,7 @@ h1, h2 {
 }
 
 .gallery-grid.expanded { display: grid; }
+.gallery-grid.adu-grid { display: grid; }
 
 .gallery-grid img {
   width: 100%;
