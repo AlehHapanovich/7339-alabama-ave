@@ -285,7 +285,10 @@ h1, h2 {
 }
 
 .gallery-grid.expanded { display: grid; }
-.gallery-grid.adu-grid { display: grid; }
+.gallery-grid.adu-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+}
 
 .gallery-grid img {
   width: 100%;
