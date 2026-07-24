@@ -1,0 +1,585 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ATM Withdrawals Report — Room 2</title>
+<style>
+  :root { color-scheme: light; }
+  .viz-root {
+    --surface-1:      #fcfcfb;
+    --page-plane:     #f9f9f7;
+    --text-primary:   #0b0b0b;
+    --text-secondary: #52514e;
+    --text-muted:     #898781;
+    --gridline:       #e1e0d9;
+    --baseline:       #c3c2b7;
+    --border:         rgba(11,11,11,0.10);
+    --series-1:       #2a78d6;
+    --series-1-wash:  #cde2fb;
+    --under:          #c0392b;
+    --under-wash:     #f6dad6;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:where(:not([data-theme="light"])) .viz-root {
+      --surface-1:      #1a1a19;
+      --page-plane:     #0d0d0d;
+      --text-primary:   #ffffff;
+      --text-secondary: #c3c2b7;
+      --text-muted:     #898781;
+      --gridline:       #2c2c2a;
+      --baseline:       #383835;
+      --border:         rgba(255,255,255,0.10);
+      --series-1:       #3987e5;
+      --series-1-wash:  #184f95;
+      --under:          #e5695a;
+      --under-wash:     #4a231f;
+    }
+  }
+  :root[data-theme="dark"] .viz-root {
+    --surface-1:      #1a1a19;
+    --page-plane:     #0d0d0d;
+    --text-primary:   #ffffff;
+    --text-secondary: #c3c2b7;
+    --text-muted:     #898781;
+    --gridline:       #2c2c2a;
+    --baseline:       #383835;
+    --border:         rgba(255,255,255,0.10);
+    --series-1:       #3987e5;
+    --series-1-wash:  #184f95;
+    --under:          #e5695a;
+    --under-wash:     #4a231f;
+  }
+
+  * { box-sizing: border-box; }
+  body { margin: 0; }
+  .viz-root {
+    font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+    background: var(--page-plane);
+    color: var(--text-primary);
+    padding: 24px 16px 64px;
+  }
+  .wrap { max-width: 980px; margin: 0 auto; }
+
+  header.report-head { margin-bottom: 24px; }
+  header.report-head h1 { font-size: 22px; margin: 0 0 4px; font-weight: 650; }
+  header.report-head .sub { color: var(--text-secondary); font-size: 14px; }
+
+  .stat-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 28px; }
+  .stat-tile { background: var(--surface-1); border: 1px solid var(--border); border-radius: 10px; padding: 14px 16px; }
+  .stat-tile .label { font-size: 12px; color: var(--text-secondary); margin-bottom: 6px; }
+  .stat-tile .value { font-size: 22px; font-weight: 650; font-variant-numeric: proportional-nums; }
+  .stat-tile .value.neg { color: var(--text-primary); }
+
+  section.panel { background: var(--surface-1); border: 1px solid var(--border); border-radius: 12px; padding: 20px; margin-bottom: 20px; }
+  section.panel h2 { font-size: 15px; margin: 0 0 16px; font-weight: 650; }
+
+  .chart-area { display: flex; gap: 12px; }
+  .y-axis { display: flex; flex-direction: column; justify-content: space-between; padding-bottom: 28px; width: 44px; flex-shrink: 0; }
+  .y-axis .tick { font-size: 11px; color: var(--text-muted); text-align: right; transform: translateY(6px); }
+  .chart-bars { flex: 1; display: flex; gap: clamp(2px, 0.6vw, 6px); align-items: stretch; position: relative; overflow-x: hidden; padding-top: 20px; min-width: 0; }
+  .chart-bars::before {
+    content: ""; position: absolute; inset: 20px 0 28px 0;
+    background-image: repeating-linear-gradient(to top, var(--gridline) 0, var(--gridline) 1px, transparent 1px, transparent 20%);
+    pointer-events: none;
+  }
+  .bar-col { flex: 1 1 0; min-width: 0; display: flex; flex-direction: column; align-items: center; position: relative; }
+  .bar-track { flex: 1; width: 100%; display: flex; align-items: flex-end; justify-content: center; height: 220px; }
+  .bar {
+    width: 60%; max-width: 20px; min-width: 3px; background: var(--series-1);
+    border-radius: 4px 4px 0 0; position: relative;
+    min-height: 2px;
+  }
+  .bar-label {
+    position: absolute; top: -20px; left: 50%; transform: translateX(-50%);
+    font-size: 11px; color: var(--text-secondary); white-space: nowrap; font-weight: 600;
+  }
+  .bar-x { font-size: 9px; color: var(--text-muted); margin-top: 8px; white-space: normal; overflow-wrap: break-word; text-align: center; line-height: 1.25; max-width: 100%; }
+  .bar-col[data-tip] { cursor: default; }
+  .bar-col[data-tip]:hover .bar { background: var(--series-1); filter: brightness(1.08); }
+  .bar-col[data-tip]::after {
+    content: attr(data-tip);
+    position: absolute; bottom: 100%; left: 50%; transform: translateX(-50%) translateY(-6px);
+    background: var(--text-primary); color: var(--surface-1);
+    font-size: 11px; padding: 5px 8px; border-radius: 6px; white-space: nowrap;
+    opacity: 0; pointer-events: none; transition: opacity 0.12s ease; z-index: 5;
+  }
+  .bar-col[data-tip]:hover::after { opacity: 1; }
+  .bar.under { background: var(--under); }
+  .bar-col[data-tip]:hover .bar.under { background: var(--under); filter: brightness(1.08); }
+  tr.under td { color: var(--under); }
+  tr.under td:first-child { font-weight: 600; }
+  .m-total.under { color: var(--under); }
+
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  th, td { text-align: left; padding: 7px 8px; border-bottom: 1px solid var(--gridline); }
+  th { color: var(--text-secondary); font-weight: 600; font-size: 12px; }
+  td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
+  .monthly-table-wrap { margin-top: 20px; }
+  .monthly-table-wrap summary { cursor: pointer; font-size: 13px; color: var(--text-secondary); margin-bottom: 8px; }
+
+  .search-row { margin-bottom: 16px; }
+  .search-row input {
+    width: 100%; padding: 10px 12px; border-radius: 8px; border: 1px solid var(--border);
+    background: var(--page-plane); color: var(--text-primary); font-size: 14px; font-family: inherit;
+  }
+  .search-row input::placeholder { color: var(--text-muted); }
+  .search-count { font-size: 12px; color: var(--text-muted); margin-top: 6px; }
+
+  details.month-block { border-bottom: 1px solid var(--gridline); }
+  details.month-block:last-child { border-bottom: none; }
+  details.month-block summary {
+    list-style: none; cursor: pointer; padding: 12px 4px; display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  }
+  details.month-block summary::-webkit-details-marker { display: none; }
+  details.month-block summary::before { content: "▸"; color: var(--text-muted); margin-right: 8px; font-size: 11px; flex-shrink: 0; }
+  details.month-block[open] summary::before { content: "▾"; }
+  details.month-block summary .m-name { font-weight: 600; font-size: 14px; flex: 1; }
+  details.month-block summary .m-meta { display: flex; gap: 16px; align-items: baseline; flex-shrink: 0; }
+  details.month-block summary .m-count { font-size: 12px; color: var(--text-muted); white-space: nowrap; }
+  details.month-block summary .m-total { font-size: 14px; font-weight: 650; font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .table-wrap { padding: 0 4px 16px; overflow-x: auto; }
+  td.desc { color: var(--text-secondary); }
+  td.date { white-space: nowrap; color: var(--text-muted); font-variant-numeric: tabular-nums; }
+  .txn-row.hidden { display: none; }
+
+  footer.notes { color: var(--text-muted); font-size: 12px; line-height: 1.6; margin-top: 24px; }
+  footer.notes code { background: var(--surface-1); padding: 1px 5px; border-radius: 4px; }
+
+  @media (max-width: 640px) {
+    .stat-row { grid-template-columns: repeat(2, 1fr); }
+    .bar-x { display: none; }
+    details.month-block summary { flex-wrap: wrap; }
+  }
+</style>
+</head>
+<body>
+<div class="viz-root">
+  <div class="wrap">
+    <header class="report-head">
+      <h1>ATM Withdrawals Report</h1>
+      <div class="sub">Room 2 · Bank of America Adv Plus Banking · Debit Account · July 2024 – December 2025</div>
+    </header>
+
+    <div class="stat-row">
+      <div class="stat-tile"><div class="label">Total ATM withdrawn</div><div class="value">$21,550.00</div></div>
+      <div class="stat-tile"><div class="label">ATM transactions</div><div class="value">43</div></div>
+      <div class="stat-tile"><div class="label">Statement periods with activity</div><div class="value">15 <span style="font-size:13px;font-weight:500;color:var(--text-secondary);">of 17</span></div></div>
+      <div class="stat-tile"><div class="label">Avg per period</div><div class="value">$1,436.67</div></div>
+    </div>
+
+    <section class="panel">
+      <h2>ATM withdrawals by statement period</h2>
+      <div class="chart-area">
+        <div class="y-axis">
+<div class="tick"><span>$3k</span></div>
+<div class="tick"><span>$2.5k</span></div>
+<div class="tick"><span>$2k</span></div>
+<div class="tick"><span>$1.5k</span></div>
+<div class="tick"><span>$1k</span></div>
+<div class="tick"><span>$0.5k</span></div>
+<div class="tick"><span>$0</span></div>
+          <div class="tick" style="visibility:hidden">$0</div>
+        </div>
+        <div class="chart-bars">
+<div class="bar-col" data-tip="July 17, 2024 to August 15, 2024: $200.00 across 2 txns">
+    <div class="bar-track"><div class="bar under" style="height:6.67%"></div></div>
+    <div class="bar-x">Jul 17 '24</div>
+  </div>
+<div class="bar-col" data-tip="August 16, 2024 to September 13, 2024: $0.00 across 0 txns">
+    <div class="bar-track"><div class="bar under" style="height:0%"></div></div>
+    <div class="bar-x">Aug 16 '24</div>
+  </div>
+<div class="bar-col" data-tip="September 14, 2024 to October 16, 2024: $440.00 across 1 txns">
+    <div class="bar-track"><div class="bar under" style="height:14.67%"></div></div>
+    <div class="bar-x">Sep 14 '24</div>
+  </div>
+<div class="bar-col" data-tip="October 17, 2024 to November 13, 2024: $1,700.00 across 3 txns">
+    <div class="bar-track"><div class="bar" style="height:56.67%"></div></div>
+    <div class="bar-x">Oct 17 '24</div>
+  </div>
+<div class="bar-col" data-tip="November 14, 2024 to December 13, 2024: $600.00 across 1 txns">
+    <div class="bar-track"><div class="bar under" style="height:20.00%"></div></div>
+    <div class="bar-x">Nov 14 '24</div>
+  </div>
+<div class="bar-col" data-tip="December 14, 2024 to January 15, 2025: $1,660.00 across 3 txns">
+    <div class="bar-track"><div class="bar" style="height:55.33%"></div></div>
+    <div class="bar-x">Dec 14 '24</div>
+  </div>
+<div class="bar-col" data-tip="January 16, 2025 to February 12, 2025: $0.00 across 0 txns">
+    <div class="bar-track"><div class="bar under" style="height:0%"></div></div>
+    <div class="bar-x">Jan 16 '25</div>
+  </div>
+<div class="bar-col" data-tip="February 13, 2025 to March 14, 2025: $1,800.00 across 3 txns">
+    <div class="bar-track"><div class="bar" style="height:60.00%"></div></div>
+    <div class="bar-x">Feb 13 '25</div>
+  </div>
+<div class="bar-col" data-tip="March 15, 2025 to April 15, 2025: $600.00 across 1 txns">
+    <div class="bar-track"><div class="bar under" style="height:20.00%"></div></div>
+    <div class="bar-x">Mar 15 '25</div>
+  </div>
+<div class="bar-col" data-tip="April 16, 2025 to May 14, 2025: $1,700.00 across 4 txns">
+    <div class="bar-track"><div class="bar" style="height:56.67%"></div></div>
+    <div class="bar-x">Apr 16 '25</div>
+  </div>
+<div class="bar-col" data-tip="May 15, 2025 to June 12, 2025: $1,300.00 across 3 txns">
+    <div class="bar-track"><div class="bar under" style="height:43.33%"></div></div>
+    <div class="bar-x">May 15 '25</div>
+  </div>
+<div class="bar-col" data-tip="June 13, 2025 to July 16, 2025: $2,050.00 across 4 txns">
+    <div class="bar-track"><div class="bar" style="height:68.33%"></div></div>
+    <div class="bar-x">Jun 13 '25</div>
+  </div>
+<div class="bar-col" data-tip="July 17, 2025 to August 14, 2025: $2,000.00 across 4 txns">
+    <div class="bar-track"><div class="bar" style="height:66.67%"></div></div>
+    <div class="bar-x">Jul 17 '25</div>
+  </div>
+<div class="bar-col" data-tip="August 15, 2025 to September 15, 2025: $2,300.00 across 5 txns">
+    <div class="bar-track"><div class="bar" style="height:76.67%"><span class="bar-label">$2,300.00</span></div></div>
+    <div class="bar-x">Aug 15 '25</div>
+  </div>
+<div class="bar-col" data-tip="September 16, 2025 to October 16, 2025: $600.00 across 1 txns">
+    <div class="bar-track"><div class="bar under" style="height:20.00%"></div></div>
+    <div class="bar-x">Sep 16 '25</div>
+  </div>
+<div class="bar-col" data-tip="October 17, 2025 to November 12, 2025: $2,300.00 across 4 txns">
+    <div class="bar-track"><div class="bar" style="height:76.67%"><span class="bar-label">$2,300.00</span></div></div>
+    <div class="bar-x">Oct 17 '25</div>
+  </div>
+<div class="bar-col" data-tip="November 13, 2025 to December 15, 2025: $2,300.00 across 4 txns">
+    <div class="bar-track"><div class="bar" style="height:76.67%"><span class="bar-label">$2,300.00</span></div></div>
+    <div class="bar-x">Nov 13 '25</div>
+  </div>
+        </div>
+      </div>
+      <details class="monthly-table-wrap">
+        <summary>View as table</summary>
+        <table>
+          <thead><tr><th>Statement period</th><th class="num">Transactions</th><th class="num">Total withdrawn</th></tr></thead>
+          <tbody>
+<tr class="under"><td>July 17, 2024 to August 15, 2024</td><td class="num">2</td><td class="num">$200.00</td></tr>
+<tr class="under"><td>August 16, 2024 to September 13, 2024</td><td class="num">0</td><td class="num">$0.00</td></tr>
+<tr class="under"><td>September 14, 2024 to October 16, 2024</td><td class="num">1</td><td class="num">$440.00</td></tr>
+<tr><td>October 17, 2024 to November 13, 2024</td><td class="num">3</td><td class="num">$1,700.00</td></tr>
+<tr class="under"><td>November 14, 2024 to December 13, 2024</td><td class="num">1</td><td class="num">$600.00</td></tr>
+<tr><td>December 14, 2024 to January 15, 2025</td><td class="num">3</td><td class="num">$1,660.00</td></tr>
+<tr class="under"><td>January 16, 2025 to February 12, 2025</td><td class="num">0</td><td class="num">$0.00</td></tr>
+<tr><td>February 13, 2025 to March 14, 2025</td><td class="num">3</td><td class="num">$1,800.00</td></tr>
+<tr class="under"><td>March 15, 2025 to April 15, 2025</td><td class="num">1</td><td class="num">$600.00</td></tr>
+<tr><td>April 16, 2025 to May 14, 2025</td><td class="num">4</td><td class="num">$1,700.00</td></tr>
+<tr class="under"><td>May 15, 2025 to June 12, 2025</td><td class="num">3</td><td class="num">$1,300.00</td></tr>
+<tr><td>June 13, 2025 to July 16, 2025</td><td class="num">4</td><td class="num">$2,050.00</td></tr>
+<tr><td>July 17, 2025 to August 14, 2025</td><td class="num">4</td><td class="num">$2,000.00</td></tr>
+<tr><td>August 15, 2025 to September 15, 2025</td><td class="num">5</td><td class="num">$2,300.00</td></tr>
+<tr class="under"><td>September 16, 2025 to October 16, 2025</td><td class="num">1</td><td class="num">$600.00</td></tr>
+<tr><td>October 17, 2025 to November 12, 2025</td><td class="num">4</td><td class="num">$2,300.00</td></tr>
+<tr><td>November 13, 2025 to December 15, 2025</td><td class="num">4</td><td class="num">$2,300.00</td></tr>
+          </tbody>
+        </table>
+      </details>
+    </section>
+
+    <section class="panel">
+      <h2>All ATM withdrawals, by statement period</h2>
+      <div class="search-row">
+        <input type="text" id="search" placeholder="Filter by location (e.g. Canoga Park, Agoura)…" autocomplete="off">
+        <div class="search-count" id="search-count"></div>
+      </div>
+      <div id="month-list">
+<details class="month-block" data-range="2024-07-17_2024-08-15">
+    <summary>
+      <span class="m-name">July 17, 2024 to August 15, 2024</span>
+      <span class="m-meta"><span class="m-count">2 withdrawals</span><span class="m-total under">$200.00</span></span>
+    </summary>
+    <div class="table-wrap">
+      <table class="txn-table">
+        <thead><tr><th>Date</th><th>Description</th><th class="num">Amount</th></tr></thead>
+        <tbody>
+<tr class="txn-row" data-desc="bkofamerica atm withdrwl canoga park ca #000004101"><td class="date">Jul 22</td><td class="desc">BKOFAMERICA ATM WITHDRWL CANOGA PARK CA #000004101</td><td class="num amt">$100.00</td></tr>
+<tr class="txn-row" data-desc="bkofamerica atm withdrwl agoura ca #000009562"><td class="date">Aug 2</td><td class="desc">BKOFAMERICA ATM WITHDRWL AGOURA CA #000009562</td><td class="num amt">$100.00</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </details>
+<details class="month-block" data-range="2024-08-16_2024-09-13">
+    <summary>
+      <span class="m-name">August 16, 2024 to September 13, 2024</span>
+      <span class="m-meta"><span class="m-count">0 withdrawals</span><span class="m-total under">$0.00</span></span>
+    </summary>
+    <div class="table-wrap">
+      <p style="padding:0 4px 16px;margin:0;color:var(--text-muted);font-size:13px;">No qualifying ATM withdrawals this period.</p>
+    </div>
+  </details>
+<details class="month-block" data-range="2024-09-14_2024-10-16">
+    <summary>
+      <span class="m-name">September 14, 2024 to October 16, 2024</span>
+      <span class="m-meta"><span class="m-count">1 withdrawals</span><span class="m-total under">$440.00</span></span>
+    </summary>
+    <div class="table-wrap">
+      <table class="txn-table">
+        <thead><tr><th>Date</th><th>Description</th><th class="num">Amount</th></tr></thead>
+        <tbody>
+<tr class="txn-row" data-desc="bkofamerica atm 09/20 #000002634 withdrwl canoga park ca"><td class="date">Sep 20</td><td class="desc">BKOFAMERICA ATM 09/20 #000002634 WITHDRWL CANOGA PARK CA</td><td class="num amt">$440.00</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </details>
+<details class="month-block" data-range="2024-10-17_2024-11-13">
+    <summary>
+      <span class="m-name">October 17, 2024 to November 13, 2024</span>
+      <span class="m-meta"><span class="m-count">3 withdrawals</span><span class="m-total">$1,700.00</span></span>
+    </summary>
+    <div class="table-wrap">
+      <table class="txn-table">
+        <thead><tr><th>Date</th><th>Description</th><th class="num">Amount</th></tr></thead>
+        <tbody>
+<tr class="txn-row" data-desc="bkofamerica atm 10/20 #000007999 withdrwl canoga park ca"><td class="date">Oct 21</td><td class="desc">BKOFAMERICA ATM 10/20 #000007999 WITHDRWL CANOGA PARK CA</td><td class="num amt">$600.00</td></tr>
+<tr class="txn-row" data-desc="bkofamerica atm 10/21 #000003178 withdrwl canoga park ca"><td class="date">Oct 21</td><td class="desc">BKOFAMERICA ATM 10/21 #000003178 WITHDRWL CANOGA PARK CA</td><td class="num amt">$600.00</td></tr>
+<tr class="txn-row" data-desc="bkofamerica atm 10/22 #000002977 withdrwl canoga park ca"><td class="date">Oct 22</td><td class="desc">BKOFAMERICA ATM 10/22 #000002977 WITHDRWL CANOGA PARK CA</td><td class="num amt">$500.00</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </details>
+<details class="month-block" data-range="2024-11-14_2024-12-13">
+    <summary>
+      <span class="m-name">November 14, 2024 to December 13, 2024</span>
+      <span class="m-meta"><span class="m-count">1 withdrawals</span><span class="m-total under">$600.00</span></span>
+    </summary>
+    <div class="table-wrap">
+      <table class="txn-table">
+        <thead><tr><th>Date</th><th>Description</th><th class="num">Amount</th></tr></thead>
+        <tbody>
+<tr class="txn-row" data-desc="bkofamerica atm 12/12 #000007101 withdrwl canoga park ca"><td class="date">Dec 13</td><td class="desc">BKOFAMERICA ATM 12/12 #000007101 WITHDRWL CANOGA PARK CA</td><td class="num amt">$600.00</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </details>
+<details class="month-block" data-range="2024-12-14_2025-01-15">
+    <summary>
+      <span class="m-name">December 14, 2024 to January 15, 2025</span>
+      <span class="m-meta"><span class="m-count">3 withdrawals</span><span class="m-total">$1,660.00</span></span>
+    </summary>
+    <div class="table-wrap">
+      <table class="txn-table">
+        <thead><tr><th>Date</th><th>Description</th><th class="num">Amount</th></tr></thead>
+        <tbody>
+<tr class="txn-row" data-desc="bkofamerica atm 12/14 #000007847 withdrwl canoga park ca"><td class="date">Dec 16</td><td class="desc">BKOFAMERICA ATM 12/14 #000007847 WITHDRWL CANOGA PARK CA</td><td class="num amt">$600.00</td></tr>
+<tr class="txn-row" data-desc="bkofamerica atm 12/15 #000008210 withdrwl canoga park ca"><td class="date">Dec 16</td><td class="desc">BKOFAMERICA ATM 12/15 #000008210 WITHDRWL CANOGA PARK CA</td><td class="num amt">$500.00</td></tr>
+<tr class="txn-row" data-desc="bkofamerica atm 12/31 #000006075 withdrwl canoga park ca"><td class="date">Dec 31</td><td class="desc">BKOFAMERICA ATM 12/31 #000006075 WITHDRWL CANOGA PARK CA</td><td class="num amt">$560.00</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </details>
+<details class="month-block" data-range="2025-01-16_2025-02-12">
+    <summary>
+      <span class="m-name">January 16, 2025 to February 12, 2025</span>
+      <span class="m-meta"><span class="m-count">0 withdrawals</span><span class="m-total under">$0.00</span></span>
+    </summary>
+    <div class="table-wrap">
+      <p style="padding:0 4px 16px;margin:0;color:var(--text-muted);font-size:13px;">No qualifying ATM withdrawals this period.</p>
+    </div>
+  </details>
+<details class="month-block" data-range="2025-02-13_2025-03-14">
+    <summary>
+      <span class="m-name">February 13, 2025 to March 14, 2025</span>
+      <span class="m-meta"><span class="m-count">3 withdrawals</span><span class="m-total">$1,800.00</span></span>
+    </summary>
+    <div class="table-wrap">
+      <table class="txn-table">
+        <thead><tr><th>Date</th><th>Description</th><th class="num">Amount</th></tr></thead>
+        <tbody>
+<tr class="txn-row" data-desc="bkofamerica atm 02/19 #000008612 withdrwl canoga park ca"><td class="date">Feb 19</td><td class="desc">BKOFAMERICA ATM 02/19 #000008612 WITHDRWL Canoga Park CA</td><td class="num amt">$600.00</td></tr>
+<tr class="txn-row" data-desc="bkofamerica atm 02/20 #000002509 withdrwl canoga park ca"><td class="date">Feb 20</td><td class="desc">BKOFAMERICA ATM 02/20 #000002509 WITHDRWL Canoga Park CA</td><td class="num amt">$600.00</td></tr>
+<tr class="txn-row" data-desc="bkofamerica atm 02/25 #000001576 withdrwl canoga park ca"><td class="date">Feb 25</td><td class="desc">BKOFAMERICA ATM 02/25 #000001576 WITHDRWL Canoga Park CA</td><td class="num amt">$600.00</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </details>
+<details class="month-block" data-range="2025-03-15_2025-04-15">
+    <summary>
+      <span class="m-name">March 15, 2025 to April 15, 2025</span>
+      <span class="m-meta"><span class="m-count">1 withdrawals</span><span class="m-total under">$600.00</span></span>
+    </summary>
+    <div class="table-wrap">
+      <table class="txn-table">
+        <thead><tr><th>Date</th><th>Description</th><th class="num">Amount</th></tr></thead>
+        <tbody>
+<tr class="txn-row" data-desc="bkofamerica atm 04/11 #000004419 withdrwl canoga park ca"><td class="date">Apr 11</td><td class="desc">BKOFAMERICA ATM 04/11 #000004419 WITHDRWL Canoga Park CA</td><td class="num amt">$600.00</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </details>
+<details class="month-block" data-range="2025-04-16_2025-05-14">
+    <summary>
+      <span class="m-name">April 16, 2025 to May 14, 2025</span>
+      <span class="m-meta"><span class="m-count">4 withdrawals</span><span class="m-total">$1,700.00</span></span>
+    </summary>
+    <div class="table-wrap">
+      <table class="txn-table">
+        <thead><tr><th>Date</th><th>Description</th><th class="num">Amount</th></tr></thead>
+        <tbody>
+<tr class="txn-row" data-desc="bkofamerica atm 04/18 #000008068 withdrwl canoga park ca"><td class="date">Apr 18</td><td class="desc">BKOFAMERICA ATM 04/18 #000008068 WITHDRWL Canoga Park CA</td><td class="num amt">$500.00</td></tr>
+<tr class="txn-row" data-desc="bkofamerica atm 04/22 #000009992 withdrwl canoga park ca"><td class="date">Apr 22</td><td class="desc">BKOFAMERICA ATM 04/22 #000009992 WITHDRWL Canoga Park CA</td><td class="num amt">$600.00</td></tr>
+<tr class="txn-row" data-desc="bkofamerica atm 04/24 #000001605 withdrwl canoga park ca"><td class="date">Apr 24</td><td class="desc">BKOFAMERICA ATM 04/24 #000001605 WITHDRWL Canoga Park CA</td><td class="num amt">$400.00</td></tr>
+<tr class="txn-row" data-desc="bkofamerica atm 04/29 #000009788 withdrwl agoura ca"><td class="date">Apr 29</td><td class="desc">BKOFAMERICA ATM 04/29 #000009788 WITHDRWL Agoura CA</td><td class="num amt">$200.00</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </details>
+<details class="month-block" data-range="2025-05-15_2025-06-12">
+    <summary>
+      <span class="m-name">May 15, 2025 to June 12, 2025</span>
+      <span class="m-meta"><span class="m-count">3 withdrawals</span><span class="m-total under">$1,300.00</span></span>
+    </summary>
+    <div class="table-wrap">
+      <table class="txn-table">
+        <thead><tr><th>Date</th><th>Description</th><th class="num">Amount</th></tr></thead>
+        <tbody>
+<tr class="txn-row" data-desc="bkofamerica atm 05/17 #000003680 withdrwl agoura ca"><td class="date">May 19</td><td class="desc">BKOFAMERICA ATM 05/17 #000003680 WITHDRWL Agoura CA</td><td class="num amt">$500.00</td></tr>
+<tr class="txn-row" data-desc="bkofamerica atm 05/19 #000003619 withdrwl canoga park ca"><td class="date">May 19</td><td class="desc">BKOFAMERICA ATM 05/19 #000003619 WITHDRWL Canoga Park CA</td><td class="num amt">$200.00</td></tr>
+<tr class="txn-row" data-desc="bkofamerica atm 05/20 #000009190 withdrwl saticoy &amp; tampa reseda ca"><td class="date">May 20</td><td class="desc">BKOFAMERICA ATM 05/20 #000009190 WITHDRWL Saticoy &amp; Tampa Reseda CA</td><td class="num amt">$600.00</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </details>
+<details class="month-block" data-range="2025-06-13_2025-07-16">
+    <summary>
+      <span class="m-name">June 13, 2025 to July 16, 2025</span>
+      <span class="m-meta"><span class="m-count">4 withdrawals</span><span class="m-total">$2,050.00</span></span>
+    </summary>
+    <div class="table-wrap">
+      <table class="txn-table">
+        <thead><tr><th>Date</th><th>Description</th><th class="num">Amount</th></tr></thead>
+        <tbody>
+<tr class="txn-row" data-desc="bkofamerica atm 06/25 #000007609 withdrwl canoga park ca"><td class="date">Jun 26</td><td class="desc">BKOFAMERICA ATM 06/25 #000007609 WITHDRWL Canoga Park CA</td><td class="num amt">$600.00</td></tr>
+<tr class="txn-row" data-desc="bkofamerica atm 06/27 #000008838 withdrwl agoura ca"><td class="date">Jun 27</td><td class="desc">BKOFAMERICA ATM 06/27 #000008838 WITHDRWL Agoura CA</td><td class="num amt">$600.00</td></tr>
+<tr class="txn-row" data-desc="bkofamerica atm 07/07 #000003197 withdrwl canoga park ca"><td class="date">Jul 7</td><td class="desc">BKOFAMERICA ATM 07/07 #000003197 WITHDRWL Canoga Park CA</td><td class="num amt">$250.00</td></tr>
+<tr class="txn-row" data-desc="bkofamerica atm 07/14 #000003856 withdrwl agoura ca"><td class="date">Jul 14</td><td class="desc">BKOFAMERICA ATM 07/14 #000003856 WITHDRWL Agoura CA</td><td class="num amt">$600.00</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </details>
+<details class="month-block" data-range="2025-07-17_2025-08-14">
+    <summary>
+      <span class="m-name">July 17, 2025 to August 14, 2025</span>
+      <span class="m-meta"><span class="m-count">4 withdrawals</span><span class="m-total">$2,000.00</span></span>
+    </summary>
+    <div class="table-wrap">
+      <table class="txn-table">
+        <thead><tr><th>Date</th><th>Description</th><th class="num">Amount</th></tr></thead>
+        <tbody>
+<tr class="txn-row" data-desc="bkofamerica atm 07/20 #000003453 withdrwl canoga park ca"><td class="date">Jul 21</td><td class="desc">BKOFAMERICA ATM 07/20 #000003453 WITHDRWL Canoga Park CA</td><td class="num amt">$600.00</td></tr>
+<tr class="txn-row" data-desc="bkofamerica atm 07/22 #000004368 withdrwl canoga park ca"><td class="date">Jul 22</td><td class="desc">BKOFAMERICA ATM 07/22 #000004368 WITHDRWL Canoga Park CA</td><td class="num amt">$500.00</td></tr>
+<tr class="txn-row" data-desc="bkofamerica atm 07/28 #000006924 withdrwl canoga park ca"><td class="date">Jul 29</td><td class="desc">BKOFAMERICA ATM 07/28 #000006924 WITHDRWL Canoga Park CA</td><td class="num amt">$600.00</td></tr>
+<tr class="txn-row" data-desc="bkofamerica atm 07/29 #000007155 withdrwl canoga park ca"><td class="date">Jul 29</td><td class="desc">BKOFAMERICA ATM 07/29 #000007155 WITHDRWL Canoga Park CA</td><td class="num amt">$300.00</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </details>
+<details class="month-block" data-range="2025-08-15_2025-09-15">
+    <summary>
+      <span class="m-name">August 15, 2025 to September 15, 2025</span>
+      <span class="m-meta"><span class="m-count">5 withdrawals</span><span class="m-total">$2,300.00</span></span>
+    </summary>
+    <div class="table-wrap">
+      <table class="txn-table">
+        <thead><tr><th>Date</th><th>Description</th><th class="num">Amount</th></tr></thead>
+        <tbody>
+<tr class="txn-row" data-desc="bkofamerica atm 08/23 #000008259 withdrwl canoga park ca"><td class="date">Aug 25</td><td class="desc">BKOFAMERICA ATM 08/23 #000008259 WITHDRWL Canoga Park CA</td><td class="num amt">$600.00</td></tr>
+<tr class="txn-row" data-desc="bkofamerica atm 08/24 #000005294 withdrwl canoga park ca"><td class="date">Aug 25</td><td class="desc">BKOFAMERICA ATM 08/24 #000005294 WITHDRWL Canoga Park CA</td><td class="num amt">$600.00</td></tr>
+<tr class="txn-row" data-desc="bkofamerica atm 08/25 #000003844 withdrwl porter ranch northridge ca"><td class="date">Aug 26</td><td class="desc">BKOFAMERICA ATM 08/25 #000003844 WITHDRWL Porter Ranch Northridge CA</td><td class="num amt">$300.00</td></tr>
+<tr class="txn-row" data-desc="bkofamerica atm 09/06 #000002368 withdrwl canoga park ca"><td class="date">Sep 8</td><td class="desc">BKOFAMERICA ATM 09/06 #000002368 WITHDRWL Canoga Park CA</td><td class="num amt">$500.00</td></tr>
+<tr class="txn-row" data-desc="bkofamerica atm 09/07 #000002712 withdrwl canoga park ca"><td class="date">Sep 8</td><td class="desc">BKOFAMERICA ATM 09/07 #000002712 WITHDRWL Canoga Park CA</td><td class="num amt">$300.00</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </details>
+<details class="month-block" data-range="2025-09-16_2025-10-16">
+    <summary>
+      <span class="m-name">September 16, 2025 to October 16, 2025</span>
+      <span class="m-meta"><span class="m-count">1 withdrawals</span><span class="m-total under">$600.00</span></span>
+    </summary>
+    <div class="table-wrap">
+      <table class="txn-table">
+        <thead><tr><th>Date</th><th>Description</th><th class="num">Amount</th></tr></thead>
+        <tbody>
+<tr class="txn-row" data-desc="bkofamerica atm 10/03 #000005835 withdrwl canoga park ca"><td class="date">Oct 6</td><td class="desc">BKOFAMERICA ATM 10/03 #000005835 WITHDRWL Canoga Park CA</td><td class="num amt">$600.00</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </details>
+<details class="month-block" data-range="2025-10-17_2025-11-12">
+    <summary>
+      <span class="m-name">October 17, 2025 to November 12, 2025</span>
+      <span class="m-meta"><span class="m-count">4 withdrawals</span><span class="m-total">$2,300.00</span></span>
+    </summary>
+    <div class="table-wrap">
+      <table class="txn-table">
+        <thead><tr><th>Date</th><th>Description</th><th class="num">Amount</th></tr></thead>
+        <tbody>
+<tr class="txn-row" data-desc="bkofamerica atm 10/20 #000001879 withdrwl canoga park ca"><td class="date">Oct 20</td><td class="desc">BKOFAMERICA ATM 10/20 #000001879 WITHDRWL Canoga Park CA</td><td class="num amt">$600.00</td></tr>
+<tr class="txn-row" data-desc="bkofamerica atm 10/26 #000004091 withdrwl canoga park ca"><td class="date">Oct 27</td><td class="desc">BKOFAMERICA ATM 10/26 #000004091 WITHDRWL Canoga Park CA</td><td class="num amt">$600.00</td></tr>
+<tr class="txn-row" data-desc="bkofamerica atm 10/29 #000007990 withdrwl canoga park ca"><td class="date">Oct 30</td><td class="desc">BKOFAMERICA ATM 10/29 #000007990 WITHDRWL Canoga Park CA</td><td class="num amt">$500.00</td></tr>
+<tr class="txn-row" data-desc="bkofamerica atm 11/02 #000007202 withdrwl canoga park ca"><td class="date">Nov 3</td><td class="desc">BKOFAMERICA ATM 11/02 #000007202 WITHDRWL Canoga Park CA</td><td class="num amt">$600.00</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </details>
+<details class="month-block" data-range="2025-11-13_2025-12-15">
+    <summary>
+      <span class="m-name">November 13, 2025 to December 15, 2025</span>
+      <span class="m-meta"><span class="m-count">4 withdrawals</span><span class="m-total">$2,300.00</span></span>
+    </summary>
+    <div class="table-wrap">
+      <table class="txn-table">
+        <thead><tr><th>Date</th><th>Description</th><th class="num">Amount</th></tr></thead>
+        <tbody>
+<tr class="txn-row" data-desc="bkofamerica atm 11/25 #000001149 withdrwl canoga park ca"><td class="date">Nov 25</td><td class="desc">BKOFAMERICA ATM 11/25 #000001149 WITHDRWL Canoga Park CA</td><td class="num amt">$600.00</td></tr>
+<tr class="txn-row" data-desc="bkofamerica atm 11/26 #000002026 withdrwl canoga park ca"><td class="date">Nov 28</td><td class="desc">BKOFAMERICA ATM 11/26 #000002026 WITHDRWL Canoga Park CA</td><td class="num amt">$600.00</td></tr>
+<tr class="txn-row" data-desc="bkofamerica atm 11/27 #000007410 withdrwl canoga park ca"><td class="date">Nov 28</td><td class="desc">BKOFAMERICA ATM 11/27 #000007410 WITHDRWL Canoga Park CA</td><td class="num amt">$500.00</td></tr>
+<tr class="txn-row" data-desc="bkofamerica atm 12/12 #000009140 withdrwl canoga park ca"><td class="date">Dec 12</td><td class="desc">BKOFAMERICA ATM 12/12 #000009140 WITHDRWL Canoga Park CA</td><td class="num amt">$600.00</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </details>
+      </div>
+    </section>
+
+    <footer class="notes">
+      <p>Generated locally — this file is not uploaded anywhere.</p>
+    </footer>
+  </div>
+</div>
+
+<script>
+const searchInput = document.getElementById('search');
+const searchCount = document.getElementById('search-count');
+const monthList = document.getElementById('month-list');
+const allRows = Array.from(monthList.querySelectorAll('.txn-row'));
+const allBlocks = Array.from(monthList.querySelectorAll('.month-block'));
+
+searchInput.addEventListener('input', () => {
+  const q = searchInput.value.trim().toLowerCase();
+  if (!q) {
+    allRows.forEach(r => r.classList.remove('hidden'));
+    allBlocks.forEach(b => { b.style.display = ''; b.open = false; });
+    searchCount.textContent = '';
+    return;
+  }
+  let matches = 0;
+  allBlocks.forEach(block => {
+    const rows = Array.from(block.querySelectorAll('.txn-row'));
+    let blockMatches = 0;
+    rows.forEach(r => {
+      const hit = r.dataset.desc.includes(q);
+      r.classList.toggle('hidden', !hit);
+      if (hit) { blockMatches++; matches++; }
+    });
+    block.style.display = blockMatches ? '' : 'none';
+    block.open = blockMatches > 0;
+  });
+  searchCount.textContent = matches + ' matching transaction' + (matches === 1 ? '' : 's');
+});
+</script>
+</body>
+</html>
