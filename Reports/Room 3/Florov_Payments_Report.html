@@ -55,7 +55,8 @@
   }
 
   * { box-sizing: border-box; }
-  body { margin: 0; }
+  html { -webkit-text-size-adjust: 100%; }
+  body { margin: 0; overflow-x: hidden; }
   .viz-root {
     font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
     background: var(--page-plane);
@@ -63,16 +64,20 @@
     padding: 24px 16px 64px;
   }
   .wrap { max-width: 980px; margin: 0 auto; }
+  h1, h2, td, th, p, summary { overflow-wrap: anywhere; }
 
   header.report-head { margin-bottom: 24px; display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; }
   header.report-head h1 { font-size: 22px; margin: 0 0 4px; font-weight: 650; }
   header.report-head .sub { color: var(--text-secondary); font-size: 14px; }
-  .theme-toggle {
-    flex-shrink: 0; cursor: pointer; font: inherit; font-size: 12px; font-weight: 600;
+  .head-actions { display: flex; gap: 8px; flex-shrink: 0; }
+  .head-actions button {
+    cursor: pointer; font: inherit; font-size: 12px; font-weight: 600; white-space: nowrap;
     color: var(--text-secondary); background: var(--surface-1);
     border: 1px solid var(--border); border-radius: 999px; padding: 6px 12px;
   }
-  .theme-toggle:hover { color: var(--text-primary); border-color: var(--baseline); }
+  .head-actions button:hover { color: var(--text-primary); border-color: var(--baseline); }
+  .head-actions .primary { color: var(--surface-1); background: var(--text-primary); border-color: var(--text-primary); }
+  .head-actions .primary:hover { color: var(--surface-1); filter: brightness(1.15); }
 
   .stat-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 28px; }
   .stat-tile { background: var(--surface-1); border: 1px solid var(--border); border-radius: 10px; padding: 14px 16px; }
@@ -122,7 +127,7 @@
   table { width: 100%; border-collapse: collapse; font-size: 13px; }
   th, td { text-align: left; padding: 7px 8px; border-bottom: 1px solid var(--gridline); }
   th { color: var(--text-secondary); font-weight: 600; font-size: 12px; }
-  td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
+  td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; overflow-wrap: normal; }
   tfoot td { font-weight: 650; border-bottom: none; border-top: 1px solid var(--baseline); }
   .monthly-table-wrap { margin-top: 20px; }
   .monthly-table-wrap summary { cursor: pointer; font-size: 13px; color: var(--text-secondary); margin-bottom: 8px; }
@@ -158,10 +163,105 @@
   footer.notes { color: var(--text-muted); font-size: 12px; line-height: 1.6; margin-top: 24px; }
   footer.notes code { background: var(--surface-1); padding: 1px 5px; border-radius: 4px; }
 
-  @media (max-width: 640px) {
-    .stat-row { grid-template-columns: repeat(2, 1fr); }
-    .bar-x { display: none; }
-    details.month-block summary { flex-wrap: wrap; }
+  .lbl-short, .ref-inline { display: none; }
+
+  @media (max-width: 700px) {
+    .viz-root { padding: 16px 12px 48px; }
+    header.report-head { flex-direction: column; align-items: stretch; gap: 12px; }
+    header.report-head h1 { font-size: 19px; }
+    header.report-head .sub { font-size: 13px; }
+    .head-actions button { flex: 1; padding: 9px 12px; min-height: 44px; font-size: 13px; }
+    details.month-block summary { min-height: 44px; }
+
+    .stat-row { grid-template-columns: repeat(2, 1fr); gap: 8px; }
+    .stat-tile { padding: 12px; }
+    .stat-tile .value { font-size: 18px; }
+    section.panel { padding: 16px 12px; border-radius: 10px; }
+
+    /* labels collapse to "Jun 2025" so month rows stop overflowing */
+    .lbl-long { display: none; }
+    .lbl-short { display: inline; }
+
+    table { font-size: 12px; }
+    th, td { padding: 6px 4px; }
+    td.date { white-space: normal; }
+
+    /* the shortfall matrix stacks into one card per basis */
+    .sf-head .sf-value { font-size: 26px; }
+    .sf-table thead { display: none; }
+    .sf-table, .sf-table tbody, .sf-table tr, .sf-table td { display: block; width: 100%; }
+    .sf-table tr { padding: 10px 0; border-bottom: 1px solid var(--gridline); }
+    .sf-table tbody tr:last-child { border-bottom: none; padding-bottom: 0; }
+    .sf-table td { border: none; padding: 3px 0; display: flex; justify-content: space-between; gap: 12px; text-align: right; }
+    .sf-table td::before { content: attr(data-label); color: var(--text-secondary); font-weight: 500; text-align: left; }
+    .sf-table td:first-child { font-size: 14px; margin-bottom: 4px; }
+    .sf-table td:first-child::before { content: none; }
+
+    /* reference moves under the sender name instead of its own column */
+    .col-ref { display: none; }
+    .ref-inline { display: block; font-size: 10px; color: var(--text-muted); font-variant-numeric: tabular-nums; }
+
+    /* marker + month on the first line, counts wrap onto the second */
+    details.month-block summary { flex-wrap: wrap; gap: 2px 12px; padding: 12px 2px; }
+    details.month-block summary .m-name { flex: 1 1 auto; }
+    details.month-block summary .m-meta { flex: 1 0 100%; gap: 12px; padding-left: 19px; }
+    .table-wrap { padding: 0 2px 14px; }
+
+    .chart-area { gap: 6px; }
+    .y-axis { width: 32px; }
+    .y-axis .tick { font-size: 10px; }
+    .bar-track { height: 170px; }
+    .bar-x { font-size: 8px; }
+    /* every third month keeps a label so the axis stays readable */
+    .bar-col:not(:nth-child(3n+1)) .bar-x { visibility: hidden; }
+    .bar-label { font-size: 10px; }
+  }
+
+  @media (max-width: 420px) {
+    .stat-row { grid-template-columns: 1fr; }
+    table { font-size: 11px; }
+    .sf-table { font-size: 12px; }
+  }
+
+  /* PDF output: always light, no interactive chrome, panels kept whole across pages */
+  @media print {
+    :root, :root[data-theme="dark"], :root[data-theme="light"] { color-scheme: light; }
+    :root .viz-root, :root[data-theme="dark"] .viz-root {
+      --surface-1:      #ffffff;
+      --page-plane:     #ffffff;
+      --text-primary:   #0b0b0b;
+      --text-secondary: #52514e;
+      --text-muted:     #6b6a66;
+      --gridline:       #e1e0d9;
+      --baseline:       #c3c2b7;
+      --border:         rgba(11,11,11,0.20);
+      --series-1:       #2a78d6;
+      --series-1-wash:  #cde2fb;
+      --under:          #c0392b;
+      --under-wash:     #f6dad6;
+    }
+    @page { size: A4 portrait; margin: 12mm; }
+    body { background: #fff; }
+    .viz-root { padding: 0; background: #fff; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .wrap { max-width: none; }
+    .head-actions { display: none !important; }
+    section.panel { break-inside: avoid; }
+    details.month-block { break-inside: avoid; }
+    details.month-block summary { cursor: default; }
+    .bar-col[data-tip]::after { display: none !important; }
+    footer.notes { break-inside: avoid; }
+    /* always print the full wide layout, even when printing from a phone */
+    .lbl-long { display: inline !important; }
+    .lbl-short, .ref-inline { display: none !important; }
+    .col-ref { display: table-cell !important; }
+    .sf-table { display: table; width: 100%; }
+    .sf-table thead { display: table-header-group; }
+    .sf-table tbody { display: table-row-group; }
+    .sf-table tr { display: table-row; padding: 0; }
+    .sf-table td { display: table-cell; padding: 7px 8px; text-align: left; }
+    .sf-table td.num { text-align: right; }
+    .sf-table td::before { content: none; }
+    .bar-x { visibility: visible !important; }
   }
 </style>
 <script>
@@ -180,7 +280,10 @@
         <h1>Florov Payments Report</h1>
         <div class="sub">Room 3 · U.S. Bank Checking · 8247 · Zelle payments received from the Florov family · June 2025 – July 2026</div>
       </div>
-      <button type="button" class="theme-toggle" id="theme-toggle"></button>
+      <div class="head-actions">
+        <button type="button" id="theme-toggle"></button>
+        <button type="button" class="primary" id="download">Download PDF</button>
+      </div>
     </header>
 
     <section class="panel shortfall">
@@ -196,20 +299,20 @@
         <thead><tr><th>Basis</th><th class="num">Rate</th><th class="num">Periods</th><th class="num">Expected</th><th class="num">Received</th><th class="num">Shortfall</th></tr></thead>
         <tbody>
           <tr>
-            <td>By week</td>
-            <td class="num">$425.00</td>
-            <td class="num">60.86 wks</td>
-            <td class="num">$25,864.29</td>
-            <td class="num">$15,575.00</td>
-            <td class="num sf-gap">$10,289.29</td>
+            <td data-label="Basis">By week</td>
+            <td class="num" data-label="Rate">$425.00</td>
+            <td class="num" data-label="Periods">60.86 wks</td>
+            <td class="num" data-label="Expected">$25,864.29</td>
+            <td class="num" data-label="Received">$15,575.00</td>
+            <td class="num sf-gap" data-label="Shortfall">$10,289.29</td>
           </tr>
           <tr>
-            <td>By month</td>
-            <td class="num">$1,700.00</td>
-            <td class="num">14 mo</td>
-            <td class="num">$23,800.00</td>
-            <td class="num">$15,575.00</td>
-            <td class="num sf-gap">$8,225.00</td>
+            <td data-label="Basis">By month</td>
+            <td class="num" data-label="Rate">$1,700.00</td>
+            <td class="num" data-label="Periods">14 mo</td>
+            <td class="num" data-label="Expected">$23,800.00</td>
+            <td class="num" data-label="Received">$15,575.00</td>
+            <td class="num sf-gap" data-label="Shortfall">$8,225.00</td>
           </tr>
         </tbody>
       </table>
@@ -313,20 +416,20 @@
         <table>
           <thead><tr><th>Month</th><th class="num">Payments</th><th class="num">Received</th><th class="num">Target</th><th class="num">Difference</th></tr></thead>
           <tbody>
-<tr><td>June 1, 2025 to June 30, 2025</td><td class="num">3</td><td class="num">$1,875.00</td><td class="num">$1,700.00</td><td class="num">+175.00</td></tr>
-<tr class="under"><td>July 1, 2025 to July 31, 2025</td><td class="num">3</td><td class="num">$1,475.00</td><td class="num">$1,700.00</td><td class="num">−225.00</td></tr>
-<tr class="under"><td>August 1, 2025 to August 31, 2025</td><td class="num">1</td><td class="num">$425.00</td><td class="num">$1,700.00</td><td class="num">−1,275.00</td></tr>
-<tr class="under"><td>September 1, 2025 to September 30, 2025</td><td class="num">2</td><td class="num">$850.00</td><td class="num">$1,700.00</td><td class="num">−850.00</td></tr>
-<tr class="under"><td>October 1, 2025 to October 31, 2025</td><td class="num">0</td><td class="num">$0.00</td><td class="num">$1,700.00</td><td class="num">−1,700.00</td></tr>
-<tr class="under"><td>November 1, 2025 to November 30, 2025</td><td class="num">1</td><td class="num">$300.00</td><td class="num">$1,700.00</td><td class="num">−1,400.00</td></tr>
-<tr class="under"><td>December 1, 2025 to December 31, 2025</td><td class="num">2</td><td class="num">$825.00</td><td class="num">$1,700.00</td><td class="num">−875.00</td></tr>
-<tr><td>January 1, 2026 to January 31, 2026</td><td class="num">4</td><td class="num">$1,725.00</td><td class="num">$1,700.00</td><td class="num">+25.00</td></tr>
-<tr class="under"><td>February 1, 2026 to February 28, 2026</td><td class="num">2</td><td class="num">$850.00</td><td class="num">$1,700.00</td><td class="num">−850.00</td></tr>
-<tr><td>March 1, 2026 to March 31, 2026</td><td class="num">5</td><td class="num">$2,125.00</td><td class="num">$1,700.00</td><td class="num">+425.00</td></tr>
-<tr class="under"><td>April 1, 2026 to April 30, 2026</td><td class="num">2</td><td class="num">$850.00</td><td class="num">$1,700.00</td><td class="num">−850.00</td></tr>
-<tr class="under"><td>May 1, 2026 to May 31, 2026</td><td class="num">2</td><td class="num">$1,275.00</td><td class="num">$1,700.00</td><td class="num">−425.00</td></tr>
-<tr><td>June 1, 2026 to June 30, 2026</td><td class="num">2</td><td class="num">$1,700.00</td><td class="num">$1,700.00</td><td class="num">+0.00</td></tr>
-<tr class="under"><td>July 1, 2026 to July 31, 2026</td><td class="num">2</td><td class="num">$1,300.00</td><td class="num">$1,700.00</td><td class="num">−400.00</td></tr>
+<tr><td><span class="lbl-long">June 1, 2025 to June 30, 2025</span><span class="lbl-short">Jun 2025</span></td><td class="num">3</td><td class="num">$1,875.00</td><td class="num">$1,700.00</td><td class="num">+175.00</td></tr>
+<tr class="under"><td><span class="lbl-long">July 1, 2025 to July 31, 2025</span><span class="lbl-short">Jul 2025</span></td><td class="num">3</td><td class="num">$1,475.00</td><td class="num">$1,700.00</td><td class="num">−225.00</td></tr>
+<tr class="under"><td><span class="lbl-long">August 1, 2025 to August 31, 2025</span><span class="lbl-short">Aug 2025</span></td><td class="num">1</td><td class="num">$425.00</td><td class="num">$1,700.00</td><td class="num">−1,275.00</td></tr>
+<tr class="under"><td><span class="lbl-long">September 1, 2025 to September 30, 2025</span><span class="lbl-short">Sep 2025</span></td><td class="num">2</td><td class="num">$850.00</td><td class="num">$1,700.00</td><td class="num">−850.00</td></tr>
+<tr class="under"><td><span class="lbl-long">October 1, 2025 to October 31, 2025</span><span class="lbl-short">Oct 2025</span></td><td class="num">0</td><td class="num">$0.00</td><td class="num">$1,700.00</td><td class="num">−1,700.00</td></tr>
+<tr class="under"><td><span class="lbl-long">November 1, 2025 to November 30, 2025</span><span class="lbl-short">Nov 2025</span></td><td class="num">1</td><td class="num">$300.00</td><td class="num">$1,700.00</td><td class="num">−1,400.00</td></tr>
+<tr class="under"><td><span class="lbl-long">December 1, 2025 to December 31, 2025</span><span class="lbl-short">Dec 2025</span></td><td class="num">2</td><td class="num">$825.00</td><td class="num">$1,700.00</td><td class="num">−875.00</td></tr>
+<tr><td><span class="lbl-long">January 1, 2026 to January 31, 2026</span><span class="lbl-short">Jan 2026</span></td><td class="num">4</td><td class="num">$1,725.00</td><td class="num">$1,700.00</td><td class="num">+25.00</td></tr>
+<tr class="under"><td><span class="lbl-long">February 1, 2026 to February 28, 2026</span><span class="lbl-short">Feb 2026</span></td><td class="num">2</td><td class="num">$850.00</td><td class="num">$1,700.00</td><td class="num">−850.00</td></tr>
+<tr><td><span class="lbl-long">March 1, 2026 to March 31, 2026</span><span class="lbl-short">Mar 2026</span></td><td class="num">5</td><td class="num">$2,125.00</td><td class="num">$1,700.00</td><td class="num">+425.00</td></tr>
+<tr class="under"><td><span class="lbl-long">April 1, 2026 to April 30, 2026</span><span class="lbl-short">Apr 2026</span></td><td class="num">2</td><td class="num">$850.00</td><td class="num">$1,700.00</td><td class="num">−850.00</td></tr>
+<tr class="under"><td><span class="lbl-long">May 1, 2026 to May 31, 2026</span><span class="lbl-short">May 2026</span></td><td class="num">2</td><td class="num">$1,275.00</td><td class="num">$1,700.00</td><td class="num">−425.00</td></tr>
+<tr><td><span class="lbl-long">June 1, 2026 to June 30, 2026</span><span class="lbl-short">Jun 2026</span></td><td class="num">2</td><td class="num">$1,700.00</td><td class="num">$1,700.00</td><td class="num">+0.00</td></tr>
+<tr class="under"><td><span class="lbl-long">July 1, 2026 to July 31, 2026</span><span class="lbl-short">Jul 2026</span></td><td class="num">2</td><td class="num">$1,300.00</td><td class="num">$1,700.00</td><td class="num">−400.00</td></tr>
           </tbody>
           <tfoot><tr><td>Total</td><td class="num">31</td><td class="num">$15,575.00</td><td class="num">$23,800.00</td><td class="num">−8,225.00</td></tr></tfoot>
         </table>
@@ -338,68 +441,68 @@
       <div id="month-list">
 <details class="month-block" data-range="2025-06-01_2025-06-30" open>
     <summary>
-      <span class="m-name">June 1, 2025 to June 30, 2025</span>
+      <span class="m-name"><span class="lbl-long">June 1, 2025 to June 30, 2025</span><span class="lbl-short">Jun 2025</span></span>
       <span class="m-meta"><span class="m-count">3 payments</span><span class="m-total">$1,875.00</span></span>
     </summary>
     <div class="table-wrap">
       <table class="txn-table">
-        <thead><tr><th>Date</th><th>Sender</th><th>Reference</th><th class="num">Amount</th></tr></thead>
+        <thead><tr><th>Date</th><th>Sender</th><th class="col-ref">Reference</th><th class="num">Amount</th></tr></thead>
         <tbody>
-<tr class="txn-row"><td class="date">Jun 4</td><td>VLADIMIR FLOROV</td><td class="desc">WFCT0YWFV8LL</td><td class="num amt">$625.00</td></tr>
-<tr class="txn-row"><td class="date">Jun 11</td><td>VLADIMIR FLOROV</td><td class="desc">WFCT0YX5CPJB</td><td class="num amt">$625.00</td></tr>
-<tr class="txn-row"><td class="date">Jun 16</td><td>VLADIMIR FLOROV</td><td class="desc">WFCT0YXPZFDX</td><td class="num amt">$625.00</td></tr>
+<tr class="txn-row"><td class="date">Jun 4</td><td>VLADIMIR FLOROV<span class="ref-inline">WFCT0YWFV8LL</span></td><td class="desc col-ref">WFCT0YWFV8LL</td><td class="num amt">$625.00</td></tr>
+<tr class="txn-row"><td class="date">Jun 11</td><td>VLADIMIR FLOROV<span class="ref-inline">WFCT0YX5CPJB</span></td><td class="desc col-ref">WFCT0YX5CPJB</td><td class="num amt">$625.00</td></tr>
+<tr class="txn-row"><td class="date">Jun 16</td><td>VLADIMIR FLOROV<span class="ref-inline">WFCT0YXPZFDX</span></td><td class="desc col-ref">WFCT0YXPZFDX</td><td class="num amt">$625.00</td></tr>
         </tbody>
       </table>
     </div>
   </details>
 <details class="month-block" data-range="2025-07-01_2025-07-31" open>
     <summary>
-      <span class="m-name">July 1, 2025 to July 31, 2025</span>
+      <span class="m-name"><span class="lbl-long">July 1, 2025 to July 31, 2025</span><span class="lbl-short">Jul 2025</span></span>
       <span class="m-meta"><span class="m-count">3 payments</span><span class="m-total under">$1,475.00</span></span>
     </summary>
     <div class="table-wrap">
       <table class="txn-table">
-        <thead><tr><th>Date</th><th>Sender</th><th>Reference</th><th class="num">Amount</th></tr></thead>
+        <thead><tr><th>Date</th><th>Sender</th><th class="col-ref">Reference</th><th class="num">Amount</th></tr></thead>
         <tbody>
-<tr class="txn-row"><td class="date">Jul 8</td><td>VLADIMIR FLOROV</td><td class="desc">WFCT0YZWSB9P</td><td class="num amt">$625.00</td></tr>
-<tr class="txn-row"><td class="date">Jul 14</td><td>VLADIMIR FLOROV</td><td class="desc">WFCT0Z2JHZGZ</td><td class="num amt">$425.00</td></tr>
-<tr class="txn-row"><td class="date">Jul 22</td><td>VLADIMIR FLOROV</td><td class="desc">WFCT0Z382CQC</td><td class="num amt">$425.00</td></tr>
+<tr class="txn-row"><td class="date">Jul 8</td><td>VLADIMIR FLOROV<span class="ref-inline">WFCT0YZWSB9P</span></td><td class="desc col-ref">WFCT0YZWSB9P</td><td class="num amt">$625.00</td></tr>
+<tr class="txn-row"><td class="date">Jul 14</td><td>VLADIMIR FLOROV<span class="ref-inline">WFCT0Z2JHZGZ</span></td><td class="desc col-ref">WFCT0Z2JHZGZ</td><td class="num amt">$425.00</td></tr>
+<tr class="txn-row"><td class="date">Jul 22</td><td>VLADIMIR FLOROV<span class="ref-inline">WFCT0Z382CQC</span></td><td class="desc col-ref">WFCT0Z382CQC</td><td class="num amt">$425.00</td></tr>
         </tbody>
       </table>
     </div>
   </details>
 <details class="month-block" data-range="2025-08-01_2025-08-31" open>
     <summary>
-      <span class="m-name">August 1, 2025 to August 31, 2025</span>
+      <span class="m-name"><span class="lbl-long">August 1, 2025 to August 31, 2025</span><span class="lbl-short">Aug 2025</span></span>
       <span class="m-meta"><span class="m-count">1 payment</span><span class="m-total under">$425.00</span></span>
     </summary>
     <div class="table-wrap">
       <table class="txn-table">
-        <thead><tr><th>Date</th><th>Sender</th><th>Reference</th><th class="num">Amount</th></tr></thead>
+        <thead><tr><th>Date</th><th>Sender</th><th class="col-ref">Reference</th><th class="num">Amount</th></tr></thead>
         <tbody>
-<tr class="txn-row"><td class="date">Aug 14</td><td>VLADIMIR FLOROV</td><td class="desc">WFCT0Z5LD3CD</td><td class="num amt">$425.00</td></tr>
+<tr class="txn-row"><td class="date">Aug 14</td><td>VLADIMIR FLOROV<span class="ref-inline">WFCT0Z5LD3CD</span></td><td class="desc col-ref">WFCT0Z5LD3CD</td><td class="num amt">$425.00</td></tr>
         </tbody>
       </table>
     </div>
   </details>
 <details class="month-block" data-range="2025-09-01_2025-09-30" open>
     <summary>
-      <span class="m-name">September 1, 2025 to September 30, 2025</span>
+      <span class="m-name"><span class="lbl-long">September 1, 2025 to September 30, 2025</span><span class="lbl-short">Sep 2025</span></span>
       <span class="m-meta"><span class="m-count">2 payments</span><span class="m-total under">$850.00</span></span>
     </summary>
     <div class="table-wrap">
       <table class="txn-table">
-        <thead><tr><th>Date</th><th>Sender</th><th>Reference</th><th class="num">Amount</th></tr></thead>
+        <thead><tr><th>Date</th><th>Sender</th><th class="col-ref">Reference</th><th class="num">Amount</th></tr></thead>
         <tbody>
-<tr class="txn-row"><td class="date">Sep 3</td><td>VLADIMIR FLOROV</td><td class="desc">WFCT0Z7N8C32</td><td class="num amt">$425.00</td></tr>
-<tr class="txn-row"><td class="date">Sep 18</td><td>VLADIMIR FLOROV</td><td class="desc">WFCT0Z994M45</td><td class="num amt">$425.00</td></tr>
+<tr class="txn-row"><td class="date">Sep 3</td><td>VLADIMIR FLOROV<span class="ref-inline">WFCT0Z7N8C32</span></td><td class="desc col-ref">WFCT0Z7N8C32</td><td class="num amt">$425.00</td></tr>
+<tr class="txn-row"><td class="date">Sep 18</td><td>VLADIMIR FLOROV<span class="ref-inline">WFCT0Z994M45</span></td><td class="desc col-ref">WFCT0Z994M45</td><td class="num amt">$425.00</td></tr>
         </tbody>
       </table>
     </div>
   </details>
 <details class="month-block" data-range="2025-10-01_2025-10-31" open>
     <summary>
-      <span class="m-name">October 1, 2025 to October 31, 2025</span>
+      <span class="m-name"><span class="lbl-long">October 1, 2025 to October 31, 2025</span><span class="lbl-short">Oct 2025</span></span>
       <span class="m-meta"><span class="m-count">0 payments</span><span class="m-total under">$0.00</span></span>
     </summary>
     <div class="table-wrap">
@@ -408,139 +511,139 @@
   </details>
 <details class="month-block" data-range="2025-11-01_2025-11-30" open>
     <summary>
-      <span class="m-name">November 1, 2025 to November 30, 2025</span>
+      <span class="m-name"><span class="lbl-long">November 1, 2025 to November 30, 2025</span><span class="lbl-short">Nov 2025</span></span>
       <span class="m-meta"><span class="m-count">1 payment</span><span class="m-total under">$300.00</span></span>
     </summary>
     <div class="table-wrap">
       <table class="txn-table">
-        <thead><tr><th>Date</th><th>Sender</th><th>Reference</th><th class="num">Amount</th></tr></thead>
+        <thead><tr><th>Date</th><th>Sender</th><th class="col-ref">Reference</th><th class="num">Amount</th></tr></thead>
         <tbody>
-<tr class="txn-row"><td class="date">Nov 17</td><td>VLADIMIR FLOROV</td><td class="desc">WFCT0ZHLK28B</td><td class="num amt">$300.00</td></tr>
+<tr class="txn-row"><td class="date">Nov 17</td><td>VLADIMIR FLOROV<span class="ref-inline">WFCT0ZHLK28B</span></td><td class="desc col-ref">WFCT0ZHLK28B</td><td class="num amt">$300.00</td></tr>
         </tbody>
       </table>
     </div>
   </details>
 <details class="month-block" data-range="2025-12-01_2025-12-31" open>
     <summary>
-      <span class="m-name">December 1, 2025 to December 31, 2025</span>
+      <span class="m-name"><span class="lbl-long">December 1, 2025 to December 31, 2025</span><span class="lbl-short">Dec 2025</span></span>
       <span class="m-meta"><span class="m-count">2 payments</span><span class="m-total under">$825.00</span></span>
     </summary>
     <div class="table-wrap">
       <table class="txn-table">
-        <thead><tr><th>Date</th><th>Sender</th><th>Reference</th><th class="num">Amount</th></tr></thead>
+        <thead><tr><th>Date</th><th>Sender</th><th class="col-ref">Reference</th><th class="num">Amount</th></tr></thead>
         <tbody>
-<tr class="txn-row"><td class="date">Dec 9</td><td>VLADIMIR FLOROV</td><td class="desc">WFCT0ZKX2YV4</td><td class="num amt">$400.00</td></tr>
-<tr class="txn-row"><td class="date">Dec 26</td><td>VLADIMIR FLOROV</td><td class="desc">WFCT0ZMPJR62</td><td class="num amt">$425.00</td></tr>
+<tr class="txn-row"><td class="date">Dec 9</td><td>VLADIMIR FLOROV<span class="ref-inline">WFCT0ZKX2YV4</span></td><td class="desc col-ref">WFCT0ZKX2YV4</td><td class="num amt">$400.00</td></tr>
+<tr class="txn-row"><td class="date">Dec 26</td><td>VLADIMIR FLOROV<span class="ref-inline">WFCT0ZMPJR62</span></td><td class="desc col-ref">WFCT0ZMPJR62</td><td class="num amt">$425.00</td></tr>
         </tbody>
       </table>
     </div>
   </details>
 <details class="month-block" data-range="2026-01-01_2026-01-31" open>
     <summary>
-      <span class="m-name">January 1, 2026 to January 31, 2026</span>
+      <span class="m-name"><span class="lbl-long">January 1, 2026 to January 31, 2026</span><span class="lbl-short">Jan 2026</span></span>
       <span class="m-meta"><span class="m-count">4 payments</span><span class="m-total">$1,725.00</span></span>
     </summary>
     <div class="table-wrap">
       <table class="txn-table">
-        <thead><tr><th>Date</th><th>Sender</th><th>Reference</th><th class="num">Amount</th></tr></thead>
+        <thead><tr><th>Date</th><th>Sender</th><th class="col-ref">Reference</th><th class="num">Amount</th></tr></thead>
         <tbody>
-<tr class="txn-row"><td class="date">Jan 2</td><td>DANILA FLOROV</td><td class="desc">WFCT0ZND7DPT</td><td class="num amt">$425.00</td></tr>
-<tr class="txn-row"><td class="date">Jan 12</td><td>DANILA FLOROV</td><td class="desc">WFCT0ZPD62CH</td><td class="num amt">$450.00</td></tr>
-<tr class="txn-row"><td class="date">Jan 20</td><td>VLADIMIR FLOROV</td><td class="desc">WFCT0ZQ65DM5</td><td class="num amt">$425.00</td></tr>
-<tr class="txn-row"><td class="date">Jan 26</td><td>VLADIMIR FLOROV</td><td class="desc">WFCT0ZQT2RBJ</td><td class="num amt">$425.00</td></tr>
+<tr class="txn-row"><td class="date">Jan 2</td><td>DANILA FLOROV<span class="ref-inline">WFCT0ZND7DPT</span></td><td class="desc col-ref">WFCT0ZND7DPT</td><td class="num amt">$425.00</td></tr>
+<tr class="txn-row"><td class="date">Jan 12</td><td>DANILA FLOROV<span class="ref-inline">WFCT0ZPD62CH</span></td><td class="desc col-ref">WFCT0ZPD62CH</td><td class="num amt">$450.00</td></tr>
+<tr class="txn-row"><td class="date">Jan 20</td><td>VLADIMIR FLOROV<span class="ref-inline">WFCT0ZQ65DM5</span></td><td class="desc col-ref">WFCT0ZQ65DM5</td><td class="num amt">$425.00</td></tr>
+<tr class="txn-row"><td class="date">Jan 26</td><td>VLADIMIR FLOROV<span class="ref-inline">WFCT0ZQT2RBJ</span></td><td class="desc col-ref">WFCT0ZQT2RBJ</td><td class="num amt">$425.00</td></tr>
         </tbody>
       </table>
     </div>
   </details>
 <details class="month-block" data-range="2026-02-01_2026-02-28" open>
     <summary>
-      <span class="m-name">February 1, 2026 to February 28, 2026</span>
+      <span class="m-name"><span class="lbl-long">February 1, 2026 to February 28, 2026</span><span class="lbl-short">Feb 2026</span></span>
       <span class="m-meta"><span class="m-count">2 payments</span><span class="m-total under">$850.00</span></span>
     </summary>
     <div class="table-wrap">
       <table class="txn-table">
-        <thead><tr><th>Date</th><th>Sender</th><th>Reference</th><th class="num">Amount</th></tr></thead>
+        <thead><tr><th>Date</th><th>Sender</th><th class="col-ref">Reference</th><th class="num">Amount</th></tr></thead>
         <tbody>
-<tr class="txn-row"><td class="date">Feb 2</td><td>DANILA FLOROV</td><td class="desc">WFCT0ZRMFY4Z</td><td class="num amt">$425.00</td></tr>
-<tr class="txn-row"><td class="date">Feb 10</td><td>VLADIMIR FLOROV</td><td class="desc">WFCT0ZSHY3Q7</td><td class="num amt">$425.00</td></tr>
+<tr class="txn-row"><td class="date">Feb 2</td><td>DANILA FLOROV<span class="ref-inline">WFCT0ZRMFY4Z</span></td><td class="desc col-ref">WFCT0ZRMFY4Z</td><td class="num amt">$425.00</td></tr>
+<tr class="txn-row"><td class="date">Feb 10</td><td>VLADIMIR FLOROV<span class="ref-inline">WFCT0ZSHY3Q7</span></td><td class="desc col-ref">WFCT0ZSHY3Q7</td><td class="num amt">$425.00</td></tr>
         </tbody>
       </table>
     </div>
   </details>
 <details class="month-block" data-range="2026-03-01_2026-03-31" open>
     <summary>
-      <span class="m-name">March 1, 2026 to March 31, 2026</span>
+      <span class="m-name"><span class="lbl-long">March 1, 2026 to March 31, 2026</span><span class="lbl-short">Mar 2026</span></span>
       <span class="m-meta"><span class="m-count">5 payments</span><span class="m-total">$2,125.00</span></span>
     </summary>
     <div class="table-wrap">
       <table class="txn-table">
-        <thead><tr><th>Date</th><th>Sender</th><th>Reference</th><th class="num">Amount</th></tr></thead>
+        <thead><tr><th>Date</th><th>Sender</th><th class="col-ref">Reference</th><th class="num">Amount</th></tr></thead>
         <tbody>
-<tr class="txn-row"><td class="date">Mar 2</td><td>VLADIMIR FLOROV</td><td class="desc">WFCT0ZVDYZ8R</td><td class="num amt">$425.00</td></tr>
-<tr class="txn-row"><td class="date">Mar 6</td><td>DANILA FLOROV</td><td class="desc">WFCT0ZW553TH</td><td class="num amt">$425.00</td></tr>
-<tr class="txn-row"><td class="date">Mar 16</td><td>DANILA FLOROV</td><td class="desc">WFCT0ZX6NHYV</td><td class="num amt">$425.00</td></tr>
-<tr class="txn-row"><td class="date">Mar 23</td><td>VLADIMIR FLOROV</td><td class="desc">WFCT0ZXXNQR8</td><td class="num amt">$425.00</td></tr>
-<tr class="txn-row"><td class="date">Mar 30</td><td>VLADIMIR FLOROV</td><td class="desc">WFCT0ZYSR97K</td><td class="num amt">$425.00</td></tr>
+<tr class="txn-row"><td class="date">Mar 2</td><td>VLADIMIR FLOROV<span class="ref-inline">WFCT0ZVDYZ8R</span></td><td class="desc col-ref">WFCT0ZVDYZ8R</td><td class="num amt">$425.00</td></tr>
+<tr class="txn-row"><td class="date">Mar 6</td><td>DANILA FLOROV<span class="ref-inline">WFCT0ZW553TH</span></td><td class="desc col-ref">WFCT0ZW553TH</td><td class="num amt">$425.00</td></tr>
+<tr class="txn-row"><td class="date">Mar 16</td><td>DANILA FLOROV<span class="ref-inline">WFCT0ZX6NHYV</span></td><td class="desc col-ref">WFCT0ZX6NHYV</td><td class="num amt">$425.00</td></tr>
+<tr class="txn-row"><td class="date">Mar 23</td><td>VLADIMIR FLOROV<span class="ref-inline">WFCT0ZXXNQR8</span></td><td class="desc col-ref">WFCT0ZXXNQR8</td><td class="num amt">$425.00</td></tr>
+<tr class="txn-row"><td class="date">Mar 30</td><td>VLADIMIR FLOROV<span class="ref-inline">WFCT0ZYSR97K</span></td><td class="desc col-ref">WFCT0ZYSR97K</td><td class="num amt">$425.00</td></tr>
         </tbody>
       </table>
     </div>
   </details>
 <details class="month-block" data-range="2026-04-01_2026-04-30" open>
     <summary>
-      <span class="m-name">April 1, 2026 to April 30, 2026</span>
+      <span class="m-name"><span class="lbl-long">April 1, 2026 to April 30, 2026</span><span class="lbl-short">Apr 2026</span></span>
       <span class="m-meta"><span class="m-count">2 payments</span><span class="m-total under">$850.00</span></span>
     </summary>
     <div class="table-wrap">
       <table class="txn-table">
-        <thead><tr><th>Date</th><th>Sender</th><th>Reference</th><th class="num">Amount</th></tr></thead>
+        <thead><tr><th>Date</th><th>Sender</th><th class="col-ref">Reference</th><th class="num">Amount</th></tr></thead>
         <tbody>
-<tr class="txn-row"><td class="date">Apr 6</td><td>DANILA FLOROV</td><td class="desc">WFCT0ZZQ8P22</td><td class="num amt">$425.00</td></tr>
-<tr class="txn-row"><td class="date">Apr 16</td><td>DANILA FLOROV</td><td class="desc">WFCT122RKFKY</td><td class="num amt">$425.00</td></tr>
+<tr class="txn-row"><td class="date">Apr 6</td><td>DANILA FLOROV<span class="ref-inline">WFCT0ZZQ8P22</span></td><td class="desc col-ref">WFCT0ZZQ8P22</td><td class="num amt">$425.00</td></tr>
+<tr class="txn-row"><td class="date">Apr 16</td><td>DANILA FLOROV<span class="ref-inline">WFCT122RKFKY</span></td><td class="desc col-ref">WFCT122RKFKY</td><td class="num amt">$425.00</td></tr>
         </tbody>
       </table>
     </div>
   </details>
 <details class="month-block" data-range="2026-05-01_2026-05-31" open>
     <summary>
-      <span class="m-name">May 1, 2026 to May 31, 2026</span>
+      <span class="m-name"><span class="lbl-long">May 1, 2026 to May 31, 2026</span><span class="lbl-short">May 2026</span></span>
       <span class="m-meta"><span class="m-count">2 payments</span><span class="m-total under">$1,275.00</span></span>
     </summary>
     <div class="table-wrap">
       <table class="txn-table">
-        <thead><tr><th>Date</th><th>Sender</th><th>Reference</th><th class="num">Amount</th></tr></thead>
+        <thead><tr><th>Date</th><th>Sender</th><th class="col-ref">Reference</th><th class="num">Amount</th></tr></thead>
         <tbody>
-<tr class="txn-row"><td class="date">May 4</td><td>VLADIMIR FLOROV</td><td class="desc">WFCT124WMKPC</td><td class="num amt">$850.00</td></tr>
-<tr class="txn-row"><td class="date">May 19</td><td>VLADIMIR FLOROV</td><td class="desc">WFCT126JW5BH</td><td class="num amt">$425.00</td></tr>
+<tr class="txn-row"><td class="date">May 4</td><td>VLADIMIR FLOROV<span class="ref-inline">WFCT124WMKPC</span></td><td class="desc col-ref">WFCT124WMKPC</td><td class="num amt">$850.00</td></tr>
+<tr class="txn-row"><td class="date">May 19</td><td>VLADIMIR FLOROV<span class="ref-inline">WFCT126JW5BH</span></td><td class="desc col-ref">WFCT126JW5BH</td><td class="num amt">$425.00</td></tr>
         </tbody>
       </table>
     </div>
   </details>
 <details class="month-block" data-range="2026-06-01_2026-06-30" open>
     <summary>
-      <span class="m-name">June 1, 2026 to June 30, 2026</span>
+      <span class="m-name"><span class="lbl-long">June 1, 2026 to June 30, 2026</span><span class="lbl-short">Jun 2026</span></span>
       <span class="m-meta"><span class="m-count">2 payments</span><span class="m-total">$1,700.00</span></span>
     </summary>
     <div class="table-wrap">
       <table class="txn-table">
-        <thead><tr><th>Date</th><th>Sender</th><th>Reference</th><th class="num">Amount</th></tr></thead>
+        <thead><tr><th>Date</th><th>Sender</th><th class="col-ref">Reference</th><th class="num">Amount</th></tr></thead>
         <tbody>
-<tr class="txn-row"><td class="date">Jun 9</td><td>VLADIMIR FLOROV</td><td class="desc">WFCT128YNZ29</td><td class="num amt">$850.00</td></tr>
-<tr class="txn-row"><td class="date">Jun 23</td><td>VLADIMIR FLOROV</td><td class="desc">WFCT12BK855W</td><td class="num amt">$850.00</td></tr>
+<tr class="txn-row"><td class="date">Jun 9</td><td>VLADIMIR FLOROV<span class="ref-inline">WFCT128YNZ29</span></td><td class="desc col-ref">WFCT128YNZ29</td><td class="num amt">$850.00</td></tr>
+<tr class="txn-row"><td class="date">Jun 23</td><td>VLADIMIR FLOROV<span class="ref-inline">WFCT12BK855W</span></td><td class="desc col-ref">WFCT12BK855W</td><td class="num amt">$850.00</td></tr>
         </tbody>
       </table>
     </div>
   </details>
 <details class="month-block" data-range="2026-07-01_2026-07-31" open>
     <summary>
-      <span class="m-name">July 1, 2026 to July 31, 2026</span>
+      <span class="m-name"><span class="lbl-long">July 1, 2026 to July 31, 2026</span><span class="lbl-short">Jul 2026</span></span>
       <span class="m-meta"><span class="m-count">2 payments</span><span class="m-total under">$1,300.00</span></span>
     </summary>
     <div class="table-wrap">
       <table class="txn-table">
-        <thead><tr><th>Date</th><th>Sender</th><th>Reference</th><th class="num">Amount</th></tr></thead>
+        <thead><tr><th>Date</th><th>Sender</th><th class="col-ref">Reference</th><th class="num">Amount</th></tr></thead>
         <tbody>
-<tr class="txn-row"><td class="date">Jul 6</td><td>VLADIMIR FLOROV</td><td class="desc">WFCT12D6BZ47</td><td class="num amt">$850.00</td></tr>
-<tr class="txn-row"><td class="date">Jul 20</td><td>VLADIMIR FLOROV</td><td class="desc">WFCT22FRK3P9</td><td class="num amt">$450.00</td></tr>
+<tr class="txn-row"><td class="date">Jul 6</td><td>VLADIMIR FLOROV<span class="ref-inline">WFCT12D6BZ47</span></td><td class="desc col-ref">WFCT12D6BZ47</td><td class="num amt">$850.00</td></tr>
+<tr class="txn-row"><td class="date">Jul 20</td><td>VLADIMIR FLOROV<span class="ref-inline">WFCT22FRK3P9</span></td><td class="desc col-ref">WFCT22FRK3P9</td><td class="num amt">$450.00</td></tr>
         </tbody>
       </table>
     </div>
@@ -576,6 +679,19 @@
   });
   systemDark.addEventListener('change', sync);
   sync();
+
+  // Download = render this page to PDF through the browser's print pipeline,
+  // with every collapsed month temporarily expanded so nothing is missing.
+  var collapsed = [];
+  window.addEventListener('beforeprint', function () {
+    collapsed = Array.prototype.filter.call(document.querySelectorAll('details'), function (d) { return !d.open; });
+    collapsed.forEach(function (d) { d.open = true; });
+  });
+  window.addEventListener('afterprint', function () {
+    collapsed.forEach(function (d) { d.open = false; });
+    collapsed = [];
+  });
+  document.getElementById('download').addEventListener('click', function () { window.print(); });
 </script>
 </body>
 </html>
