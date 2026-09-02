@@ -70,12 +70,13 @@
   header.report-head h1 { font-size: 22px; margin: 0 0 4px; font-weight: 650; }
   header.report-head .sub { color: var(--text-secondary); font-size: 14px; }
   .head-actions { display: flex; gap: 8px; flex-shrink: 0; }
-  .head-actions button {
+  .head-actions button, .head-actions a {
     cursor: pointer; font: inherit; font-size: 12px; font-weight: 600; white-space: nowrap;
-    color: var(--text-secondary); background: var(--surface-1);
+    color: var(--text-secondary); background: var(--surface-1); text-decoration: none;
+    display: inline-flex; align-items: center; justify-content: center;
     border: 1px solid var(--border); border-radius: 999px; padding: 6px 12px;
   }
-  .head-actions button:hover { color: var(--text-primary); border-color: var(--baseline); }
+  .head-actions button:hover, .head-actions a:hover { color: var(--text-primary); border-color: var(--baseline); }
   .head-actions .primary { color: var(--surface-1); background: var(--text-primary); border-color: var(--text-primary); }
   .head-actions .primary:hover { color: var(--surface-1); filter: brightness(1.15); }
 
@@ -170,7 +171,8 @@
     header.report-head { flex-direction: column; align-items: stretch; gap: 12px; }
     header.report-head h1 { font-size: 19px; }
     header.report-head .sub { font-size: 13px; }
-    .head-actions button { flex: 1; padding: 9px 12px; min-height: 44px; font-size: 13px; }
+    .head-actions { flex-wrap: wrap; }
+    .head-actions button, .head-actions a { flex: 1 1 auto; padding: 9px 12px; min-height: 44px; font-size: 13px; }
     details.month-block summary { min-height: 44px; }
 
     .stat-row { grid-template-columns: repeat(2, 1fr); gap: 8px; }
@@ -278,10 +280,11 @@
     <header class="report-head">
       <div>
         <h1>Florov Payments Report</h1>
-        <div class="sub">Room 3 · U.S. Bank Checking · 8247 · Zelle payments received from the Florov family · July 2025 – July 2026</div>
+        <div class="sub">Room 3 · U.S. Bank Checking · 8247 · Zelle payments received from the Florov family · July 2025 – September 2026</div>
       </div>
       <div class="head-actions">
         <button type="button" id="theme-toggle"></button>
+        <a href="Florov_Rent_Ledger.pdf" download>Download Ledger</a>
         <button type="button" class="primary" id="download">Download PDF</button>
       </div>
     </header>
@@ -290,43 +293,43 @@
       <div class="sf-head">
         <div>
           <div class="sf-label">Lost income vs. $425.00 per week</div>
-          <div class="sf-value">$10,342.86</div>
+          <div class="sf-value">$11,896.43</div>
         </div>
-        <div class="sf-label">57.0% of the expected amount was received</div>
+        <div class="sf-label">57.1% of the expected amount was received</div>
       </div>
-      <div class="sf-meter"><span style="width:56.98%"></span></div>
+      <div class="sf-meter"><span style="width:57.12%"></span></div>
       <table class="sf-table">
         <thead><tr><th>Basis</th><th class="num">Rate</th><th class="num">Periods</th><th class="num">Expected</th><th class="num">Received</th><th class="num">Shortfall</th></tr></thead>
         <tbody>
           <tr>
             <td data-label="Basis">By week</td>
             <td class="num" data-label="Rate">$425.00</td>
-            <td class="num" data-label="Periods">56.57 wks</td>
-            <td class="num" data-label="Expected">$24,042.86</td>
-            <td class="num" data-label="Received">$13,700.00</td>
-            <td class="num sf-gap" data-label="Shortfall">$10,342.86</td>
+            <td class="num" data-label="Periods">65.29 wks</td>
+            <td class="num" data-label="Expected">$27,746.43</td>
+            <td class="num" data-label="Received">$15,850.00</td>
+            <td class="num sf-gap" data-label="Shortfall">$11,896.43</td>
           </tr>
           <tr>
             <td data-label="Basis">By month</td>
             <td class="num" data-label="Rate">$1,700.00</td>
-            <td class="num" data-label="Periods">13 mo</td>
-            <td class="num" data-label="Expected">$22,100.00</td>
-            <td class="num" data-label="Received">$13,700.00</td>
-            <td class="num sf-gap" data-label="Shortfall">$8,400.00</td>
+            <td class="num" data-label="Periods">15 mo</td>
+            <td class="num" data-label="Expected">$25,500.00</td>
+            <td class="num" data-label="Received">$15,850.00</td>
+            <td class="num sf-gap" data-label="Shortfall">$9,650.00</td>
           </tr>
         </tbody>
       </table>
       <div class="sf-formula">
-        By week: $425.00 × 56.57 weeks (396 days ÷ 7) = $24,042.86.<br>
-        By month: $1,700.00 × 13 months (July 2025 – July 2026) = $22,100.00.
+        By week: $425.00 × 65.29 weeks (457 days ÷ 7) = $27,746.43.<br>
+        By month: $1,700.00 × 15 months (July 2025 – September 2026) = $25,500.00.
       </div>
     </section>
 
     <div class="stat-row">
-      <div class="stat-tile"><div class="label">Total received</div><div class="value">$13,700.00</div></div>
-      <div class="stat-tile"><div class="label">Payments</div><div class="value">28</div></div>
-      <div class="stat-tile"><div class="label">Months with activity</div><div class="value">12 <span style="font-size:13px;font-weight:500;color:var(--text-secondary);">of 13</span></div></div>
-      <div class="stat-tile"><div class="label">Avg per week</div><div class="value">$242.17 <span style="font-size:13px;font-weight:500;color:var(--text-secondary);">of $425.00</span></div></div>
+      <div class="stat-tile"><div class="label">Total received</div><div class="value">$15,850.00</div></div>
+      <div class="stat-tile"><div class="label">Payments</div><div class="value">33</div></div>
+      <div class="stat-tile"><div class="label">Months with activity</div><div class="value">14 <span style="font-size:13px;font-weight:500;color:var(--text-secondary);">of 15</span></div></div>
+      <div class="stat-tile"><div class="label">Avg per week</div><div class="value">$242.78 <span style="font-size:13px;font-weight:500;color:var(--text-secondary);">of $425.00</span></div></div>
     </div>
 
     <section class="panel">
@@ -334,7 +337,7 @@
       <table>
         <thead><tr><th>Sender</th><th class="num">Payments</th><th class="num">Total</th><th>Active range</th></tr></thead>
         <tbody>
-<tr><td>VLADIMIR FLOROV</td><td class="num">21</td><td class="num">$10,700.00</td><td class="date">July 8, 2025 – July 20, 2026</td></tr>
+<tr><td>VLADIMIR FLOROV</td><td class="num">26</td><td class="num">$12,850.00</td><td class="date">July 8, 2025 – September 1, 2026</td></tr>
 <tr><td>DANILA FLOROV</td><td class="num">7</td><td class="num">$3,000.00</td><td class="date">January 2, 2026 – April 16, 2026</td></tr>
         </tbody>
       </table>
@@ -405,6 +408,14 @@
     <div class="bar-track"><div class="bar under" style="height:52.00%"></div></div>
     <div class="bar-x">Jul '26</div>
   </div>
+<div class="bar-col" data-tip="August 1, 2026 to August 31, 2026: $1,725.00 of $1,700.00 across 4 txns — over by $25.00">
+    <div class="bar-track"><div class="bar" style="height:69.00%"></div></div>
+    <div class="bar-x">Aug '26</div>
+  </div>
+<div class="bar-col" data-tip="September 1, 2026 to September 30, 2026: $425.00 of $1,700.00 across 1 txns — short $1,275.00">
+    <div class="bar-track"><div class="bar under" style="height:17.00%"></div></div>
+    <div class="bar-x">Sep '26</div>
+  </div>
         </div>
       </div>
       <details class="monthly-table-wrap" open>
@@ -425,8 +436,10 @@
 <tr class="under"><td><span class="lbl-long">May 1, 2026 to May 31, 2026</span><span class="lbl-short">May 2026</span></td><td class="num">2</td><td class="num">$1,275.00</td><td class="num">$1,700.00</td><td class="num">−425.00</td></tr>
 <tr><td><span class="lbl-long">June 1, 2026 to June 30, 2026</span><span class="lbl-short">Jun 2026</span></td><td class="num">2</td><td class="num">$1,700.00</td><td class="num">$1,700.00</td><td class="num">+0.00</td></tr>
 <tr class="under"><td><span class="lbl-long">July 1, 2026 to July 31, 2026</span><span class="lbl-short">Jul 2026</span></td><td class="num">2</td><td class="num">$1,300.00</td><td class="num">$1,700.00</td><td class="num">−400.00</td></tr>
+<tr><td><span class="lbl-long">August 1, 2026 to August 31, 2026</span><span class="lbl-short">Aug 2026</span></td><td class="num">4</td><td class="num">$1,725.00</td><td class="num">$1,700.00</td><td class="num">+25.00</td></tr>
+<tr class="under"><td><span class="lbl-long">September 1, 2026 to September 30, 2026</span><span class="lbl-short">Sep 2026</span></td><td class="num">1</td><td class="num">$425.00</td><td class="num">$1,700.00</td><td class="num">−1,275.00</td></tr>
           </tbody>
-          <tfoot><tr><td>Total</td><td class="num">28</td><td class="num">$13,700.00</td><td class="num">$22,100.00</td><td class="num">−8,400.00</td></tr></tfoot>
+          <tfoot><tr><td>Total</td><td class="num">33</td><td class="num">$15,850.00</td><td class="num">$25,500.00</td><td class="num">−9,650.00</td></tr></tfoot>
         </table>
       </details>
     </section>
@@ -627,12 +640,43 @@
       </table>
     </div>
   </details>
+<details class="month-block" data-range="2026-08-01_2026-08-31" open>
+    <summary>
+      <span class="m-name"><span class="lbl-long">August 1, 2026 to August 31, 2026</span><span class="lbl-short">Aug 2026</span></span>
+      <span class="m-meta"><span class="m-count">4 payments</span><span class="m-total">$1,725.00</span></span>
+    </summary>
+    <div class="table-wrap">
+      <table class="txn-table">
+        <thead><tr><th>Date</th><th>Sender</th><th class="col-ref">Reference</th><th class="num">Amount</th></tr></thead>
+        <tbody>
+<tr class="txn-row"><td class="date">Aug 4</td><td>VLADIMIR FLOROV<span class="ref-inline">WFCT22HGF72J</span></td><td class="desc col-ref">WFCT22HGF72J</td><td class="num amt">$450.00</td></tr>
+<tr class="txn-row"><td class="date">Aug 11</td><td>VLADIMIR FLOROV<span class="ref-inline">WFCT22J8HNBL</span></td><td class="desc col-ref">WFCT22J8HNBL</td><td class="num amt">$425.00</td></tr>
+<tr class="txn-row"><td class="date">Aug 17</td><td>VLADIMIR FLOROV<span class="ref-inline">WFCT22JXFGF4</span></td><td class="desc col-ref">WFCT22JXFGF4</td><td class="num amt">$425.00</td></tr>
+<tr class="txn-row"><td class="date">Aug 27</td><td>VLADIMIR FLOROV<span class="ref-inline">WFCT22L3L55J</span></td><td class="desc col-ref">WFCT22L3L55J</td><td class="num amt">$425.00</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </details>
+<details class="month-block" data-range="2026-09-01_2026-09-30" open>
+    <summary>
+      <span class="m-name"><span class="lbl-long">September 1, 2026 to September 30, 2026</span><span class="lbl-short">Sep 2026</span></span>
+      <span class="m-meta"><span class="m-count">1 payment</span><span class="m-total under">$425.00</span></span>
+    </summary>
+    <div class="table-wrap">
+      <table class="txn-table">
+        <thead><tr><th>Date</th><th>Sender</th><th class="col-ref">Reference</th><th class="num">Amount</th></tr></thead>
+        <tbody>
+<tr class="txn-row"><td class="date">Sep 1</td><td>VLADIMIR FLOROV<span class="ref-inline">WFCT22LQKWRP</span></td><td class="desc col-ref">WFCT22LQKWRP</td><td class="num amt">$425.00</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </details>
       </div>
     </section>
 
     <footer class="notes">
-      <p>Source: <code>Checking - 8247_01-01-2025_08-08-2026.csv</code> (Room 3). Rows matched on the surname <code>FLOROV</code> in the transaction name — covers VLADIMIR FLOROV and DANILA FLOROV. Payments from NINA FLOROVA are excluded from this report, as are individual payments of $25, $50 and $60. All 28 included rows are incoming CREDIT transactions.</p>
-      <p>Reporting periods run from the first to the last calendar day of each month, from July 1, 2025 through July 31, 2026. Transactions outside that window are excluded, including August 2026 — the export ends 3 August 2026 and that month is incomplete. Two agreed rates are used: $425.00 per week and $1,700.00 per month. The headline shortfall is the weekly basis; monthly targets and the red highlighting use the $1,700.00 monthly rate.</p>
+      <p>Source: <code>Checking - 8247_07-01-2025_09-06-2026.csv</code> (Room 3). Covers payments from VLADIMIR FLOROV and DANILA FLOROV. Deposits from NINA FLOROVA share the surname but come from an unrelated party who is not a tenant of this room, and form no part of this report. Individual payments of $25, $50 and $60 are payments for cleaning, a service charged separately from the rent, and are left out of the rent figures; nothing is outstanding on that account. All 33 included rows are incoming CREDIT transactions.</p>
+      <p>Reporting periods run from the first to the last calendar day of each month, from July 1, 2025 through September 30, 2026. September 2026 is included even though the export ends September 1, 2026, so that month is partial. Two agreed rates are used: $425.00 per week and $1,700.00 per month. The headline shortfall is the weekly basis; monthly targets and the red highlighting use the $1,700.00 monthly rate.</p>
     </footer>
   </div>
 </div>
