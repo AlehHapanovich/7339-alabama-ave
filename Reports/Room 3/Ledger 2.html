@@ -1,0 +1,1035 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ledger 2 — Room A — Florov</title>
+<style>
+  :root { color-scheme: light; }
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    margin: 0; background: #f8f9fa; color: #202124;
+    font-family: Arial, "Helvetica Neue", Helvetica, sans-serif; font-size: 13px;
+  }
+  .bar {
+    position: sticky; top: 0; z-index: 5;
+    display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;
+    background: #fff; border-bottom: 1px solid #dadce0; padding: 10px 16px;
+  }
+  .bar h1 { font-size: 15px; margin: 0; font-weight: 600; }
+  .bar .actions { display: flex; gap: 8px; }
+  .bar a, .bar button {
+    font: inherit; font-size: 12px; font-weight: 600; cursor: pointer; text-decoration: none;
+    color: #1a73e8; background: #fff; border: 1px solid #dadce0; border-radius: 4px; padding: 6px 12px;
+    display: inline-flex; align-items: center;
+  }
+  .bar a:hover, .bar button:hover { background: #f1f3f4; }
+
+  .sheet-wrap { overflow-x: auto; padding: 16px; }
+  table.sheet { border-collapse: collapse; background: #fff; font-variant-numeric: tabular-nums; min-width: 100%; }
+  table.sheet td, table.sheet th { border: 1px solid #d0d7de; padding: 4px 8px; vertical-align: top; text-align: left; }
+
+  td.rownum {
+    width: 34px; min-width: 34px; text-align: center; color: #5f6368; background: #f8f9fa;
+    font-size: 11px; border-color: #d0d7de; user-select: none;
+  }
+  tr.collabel td { background: #f1f3f4; color: #5f6368; text-align: center; font-size: 11px; font-weight: 700; padding: 2px 8px; }
+
+  tr.meta td { background: #fff; }
+  tr.meta.title td.k { font-size: 15px; font-weight: 700; letter-spacing: 0.02em; }
+  tr.meta.title td.v { font-size: 15px; font-weight: 700; }
+  tr.meta td.k { color: #5f6368; white-space: nowrap; }
+  tr.meta td.v { font-weight: 600; }
+
+  tr.colhead td, tr.colhead th { background: #e8f0fe; font-weight: 700; color: #174ea6; white-space: nowrap; }
+  tr.colhead th.num { text-align: right; }
+
+  td.num { text-align: right; white-space: nowrap; }
+  td.date { white-space: nowrap; }
+  td.desc { white-space: nowrap; }
+  td.ref { font-family: ui-monospace, "Courier New", monospace; font-size: 11px; color: #5f6368; white-space: nowrap; }
+  tr.pay td { background: #f1f8f4; }
+  tr.pay td.credit { color: #137333; font-weight: 700; }
+  td.bal { font-weight: 700; }
+  td.bal.neg { color: #137333; }
+
+  tr.totals td { background: #fce8e6; font-weight: 700; border-top: 2px solid #202124; }
+  tr.totals td.bal { color: #a50e0e; font-size: 14px; }
+
+  tr.spacer td { background: #fff; height: 10px; border-left-color: #d0d7de; }
+  tr.note td.k { color: #5f6368; white-space: nowrap; }
+  tr.note td.v { color: #3c4043; font-size: 12px; }
+
+  @media (max-width: 700px) {
+    .sheet-wrap { padding: 8px; }
+    table.sheet { font-size: 11px; }
+    table.sheet td, table.sheet th { padding: 3px 5px; }
+    td.rownum { width: 26px; min-width: 26px; }
+    .bar a, .bar button { min-height: 40px; }
+  }
+
+  @media print {
+    body { background: #fff; }
+    .bar { display: none !important; }
+    .sheet-wrap { padding: 0; overflow: visible; }
+    @page { size: A4 portrait; margin: 12mm; }
+    table.sheet { font-size: 10.5px; }
+    td.desc { white-space: normal; }
+    table.sheet td, table.sheet th { padding: 2px 5px; }
+    tr { break-inside: avoid; }
+    tr.colhead { display: table-row; }
+    thead { display: table-header-group; }
+    -webkit-print-color-adjust: exact; print-color-adjust: exact;
+  }
+</style>
+</head>
+<body>
+
+<div class="bar">
+  <h1>Ledger 2 — Room A · weekly rent account</h1>
+  <div class="actions">
+    <a href="Ledger%202.csv" download>Download CSV</a>
+    <button type="button" id="print">Print / PDF</button>
+  </div>
+</div>
+
+<div class="sheet-wrap">
+  <table class="sheet">
+    <tbody>
+    <tr class="collabel">
+      <td></td><td>A</td><td>B</td><td>C</td><td>D</td><td>E</td><td>F</td>
+    </tr>
+<tr class="meta title">
+      <td class="rownum">1</td>
+      <td class="k">RENT LEDGER</td>
+      <td class="v" colspan="5">Room A — weekly tenancy</td>
+    </tr>
+<tr class="meta">
+      <td class="rownum">2</td>
+      <td class="k">Tenants</td>
+      <td class="v" colspan="5">VLADIMIR FLOROV, DANILA FLOROV</td>
+    </tr>
+<tr class="meta">
+      <td class="rownum">3</td>
+      <td class="k">Rent rate</td>
+      <td class="v" colspan="5">$425.00 per week</td>
+    </tr>
+<tr class="meta">
+      <td class="rownum">4</td>
+      <td class="k">Ledger period</td>
+      <td class="v" colspan="5">July 1, 2025 through September 3, 2026</td>
+    </tr>
+<tr class="meta">
+      <td class="rownum">5</td>
+      <td class="k">Deposit account</td>
+      <td class="v" colspan="5">U.S. Bank Checking ····8247</td>
+    </tr>
+<tr class="meta">
+      <td class="rownum">6</td>
+      <td class="k">Prepared</td>
+      <td class="v" colspan="5">September 3, 2026</td>
+    </tr>
+<tr class="spacer"><td class="rownum">7</td><td colspan="6"></td></tr>
+<tr class="colhead">
+      <td class="rownum">8</td>
+      <th>Date</th><th>Description</th><th class="num">Debit (Charge)</th><th class="num">Credit (Payment)</th><th class="num">Balance Due</th><th>Reference</th>
+    </tr>
+<tr class="chg">
+      <td class="rownum">9</td>
+      <td class="date">07/01/2025</td>
+      <td class="desc">Rent due — week of July 1, 2025</td>
+      <td class="num debit">$425.00</td>
+      <td class="num credit"></td>
+      <td class="num bal">$425.00</td>
+      <td class="ref"></td>
+    </tr>
+<tr class="chg">
+      <td class="rownum">10</td>
+      <td class="date">07/08/2025</td>
+      <td class="desc">Rent due — week of July 8, 2025</td>
+      <td class="num debit">$425.00</td>
+      <td class="num credit"></td>
+      <td class="num bal">$850.00</td>
+      <td class="ref"></td>
+    </tr>
+<tr class="pay">
+      <td class="rownum">11</td>
+      <td class="date">07/08/2025</td>
+      <td class="desc">Payment — Zelle from VLADIMIR FLOROV</td>
+      <td class="num debit"></td>
+      <td class="num credit">$625.00</td>
+      <td class="num bal">$225.00</td>
+      <td class="ref">WFCT0YZWSB9P</td>
+    </tr>
+<tr class="pay">
+      <td class="rownum">12</td>
+      <td class="date">07/14/2025</td>
+      <td class="desc">Payment — Zelle from VLADIMIR FLOROV</td>
+      <td class="num debit"></td>
+      <td class="num credit">$425.00</td>
+      <td class="num bal neg">−$200.00</td>
+      <td class="ref">WFCT0Z2JHZGZ</td>
+    </tr>
+<tr class="chg">
+      <td class="rownum">13</td>
+      <td class="date">07/15/2025</td>
+      <td class="desc">Rent due — week of July 15, 2025</td>
+      <td class="num debit">$425.00</td>
+      <td class="num credit"></td>
+      <td class="num bal">$225.00</td>
+      <td class="ref"></td>
+    </tr>
+<tr class="chg">
+      <td class="rownum">14</td>
+      <td class="date">07/22/2025</td>
+      <td class="desc">Rent due — week of July 22, 2025</td>
+      <td class="num debit">$425.00</td>
+      <td class="num credit"></td>
+      <td class="num bal">$650.00</td>
+      <td class="ref"></td>
+    </tr>
+<tr class="pay">
+      <td class="rownum">15</td>
+      <td class="date">07/22/2025</td>
+      <td class="desc">Payment — Zelle from VLADIMIR FLOROV</td>
+      <td class="num debit"></td>
+      <td class="num credit">$425.00</td>
+      <td class="num bal">$225.00</td>
+      <td class="ref">WFCT0Z382CQC</td>
+    </tr>
+<tr class="chg">
+      <td class="rownum">16</td>
+      <td class="date">07/29/2025</td>
+      <td class="desc">Rent due — week of July 29, 2025</td>
+      <td class="num debit">$425.00</td>
+      <td class="num credit"></td>
+      <td class="num bal">$650.00</td>
+      <td class="ref"></td>
+    </tr>
+<tr class="chg">
+      <td class="rownum">17</td>
+      <td class="date">08/05/2025</td>
+      <td class="desc">Rent due — week of August 5, 2025</td>
+      <td class="num debit">$425.00</td>
+      <td class="num credit"></td>
+      <td class="num bal">$1,075.00</td>
+      <td class="ref"></td>
+    </tr>
+<tr class="chg">
+      <td class="rownum">18</td>
+      <td class="date">08/12/2025</td>
+      <td class="desc">Rent due — week of August 12, 2025</td>
+      <td class="num debit">$425.00</td>
+      <td class="num credit"></td>
+      <td class="num bal">$1,500.00</td>
+      <td class="ref"></td>
+    </tr>
+<tr class="pay">
+      <td class="rownum">19</td>
+      <td class="date">08/14/2025</td>
+      <td class="desc">Payment — Zelle from VLADIMIR FLOROV</td>
+      <td class="num debit"></td>
+      <td class="num credit">$425.00</td>
+      <td class="num bal">$1,075.00</td>
+      <td class="ref">WFCT0Z5LD3CD</td>
+    </tr>
+<tr class="chg">
+      <td class="rownum">20</td>
+      <td class="date">08/19/2025</td>
+      <td class="desc">Rent due — week of August 19, 2025</td>
+      <td class="num debit">$425.00</td>
+      <td class="num credit"></td>
+      <td class="num bal">$1,500.00</td>
+      <td class="ref"></td>
+    </tr>
+<tr class="chg">
+      <td class="rownum">21</td>
+      <td class="date">08/26/2025</td>
+      <td class="desc">Rent due — week of August 26, 2025</td>
+      <td class="num debit">$425.00</td>
+      <td class="num credit"></td>
+      <td class="num bal">$1,925.00</td>
+      <td class="ref"></td>
+    </tr>
+<tr class="chg">
+      <td class="rownum">22</td>
+      <td class="date">09/02/2025</td>
+      <td class="desc">Rent due — week of September 2, 2025</td>
+      <td class="num debit">$425.00</td>
+      <td class="num credit"></td>
+      <td class="num bal">$2,350.00</td>
+      <td class="ref"></td>
+    </tr>
+<tr class="pay">
+      <td class="rownum">23</td>
+      <td class="date">09/03/2025</td>
+      <td class="desc">Payment — Zelle from VLADIMIR FLOROV</td>
+      <td class="num debit"></td>
+      <td class="num credit">$425.00</td>
+      <td class="num bal">$1,925.00</td>
+      <td class="ref">WFCT0Z7N8C32</td>
+    </tr>
+<tr class="chg">
+      <td class="rownum">24</td>
+      <td class="date">09/09/2025</td>
+      <td class="desc">Rent due — week of September 9, 2025</td>
+      <td class="num debit">$425.00</td>
+      <td class="num credit"></td>
+      <td class="num bal">$2,350.00</td>
+      <td class="ref"></td>
+    </tr>
+<tr class="chg">
+      <td class="rownum">25</td>
+      <td class="date">09/16/2025</td>
+      <td class="desc">Rent due — week of September 16, 2025</td>
+      <td class="num debit">$425.00</td>
+      <td class="num credit"></td>
+      <td class="num bal">$2,775.00</td>
+      <td class="ref"></td>
+    </tr>
+<tr class="pay">
+      <td class="rownum">26</td>
+      <td class="date">09/18/2025</td>
+      <td class="desc">Payment — Zelle from VLADIMIR FLOROV</td>
+      <td class="num debit"></td>
+      <td class="num credit">$425.00</td>
+      <td class="num bal">$2,350.00</td>
+      <td class="ref">WFCT0Z994M45</td>
+    </tr>
+<tr class="chg">
+      <td class="rownum">27</td>
+      <td class="date">09/23/2025</td>
+      <td class="desc">Rent due — week of September 23, 2025</td>
+      <td class="num debit">$425.00</td>
+      <td class="num credit"></td>
+      <td class="num bal">$2,775.00</td>
+      <td class="ref"></td>
+    </tr>
+<tr class="chg">
+      <td class="rownum">28</td>
+      <td class="date">09/30/2025</td>
+      <td class="desc">Rent due — week of September 30, 2025</td>
+      <td class="num debit">$425.00</td>
+      <td class="num credit"></td>
+      <td class="num bal">$3,200.00</td>
+      <td class="ref"></td>
+    </tr>
+<tr class="chg">
+      <td class="rownum">29</td>
+      <td class="date">10/07/2025</td>
+      <td class="desc">Rent due — week of October 7, 2025</td>
+      <td class="num debit">$425.00</td>
+      <td class="num credit"></td>
+      <td class="num bal">$3,625.00</td>
+      <td class="ref"></td>
+    </tr>
+<tr class="chg">
+      <td class="rownum">30</td>
+      <td class="date">10/14/2025</td>
+      <td class="desc">Rent due — week of October 14, 2025</td>
+      <td class="num debit">$425.00</td>
+      <td class="num credit"></td>
+      <td class="num bal">$4,050.00</td>
+      <td class="ref"></td>
+    </tr>
+<tr class="chg">
+      <td class="rownum">31</td>
+      <td class="date">10/21/2025</td>
+      <td class="desc">Rent due — week of October 21, 2025</td>
+      <td class="num debit">$425.00</td>
+      <td class="num credit"></td>
+      <td class="num bal">$4,475.00</td>
+      <td class="ref"></td>
+    </tr>
+<tr class="chg">
+      <td class="rownum">32</td>
+      <td class="date">10/28/2025</td>
+      <td class="desc">Rent due — week of October 28, 2025</td>
+      <td class="num debit">$425.00</td>
+      <td class="num credit"></td>
+      <td class="num bal">$4,900.00</td>
+      <td class="ref"></td>
+    </tr>
+<tr class="chg">
+      <td class="rownum">33</td>
+      <td class="date">11/04/2025</td>
+      <td class="desc">Rent due — week of November 4, 2025</td>
+      <td class="num debit">$425.00</td>
+      <td class="num credit"></td>
+      <td class="num bal">$5,325.00</td>
+      <td class="ref"></td>
+    </tr>
+<tr class="chg">
+      <td class="rownum">34</td>
+      <td class="date">11/11/2025</td>
+      <td class="desc">Rent due — week of November 11, 2025</td>
+      <td class="num debit">$425.00</td>
+      <td class="num credit"></td>
+      <td class="num bal">$5,750.00</td>
+      <td class="ref"></td>
+    </tr>
+<tr class="pay">
+      <td class="rownum">35</td>
+      <td class="date">11/17/2025</td>
+      <td class="desc">Payment — Zelle from VLADIMIR FLOROV</td>
+      <td class="num debit"></td>
+      <td class="num credit">$300.00</td>
+      <td class="num bal">$5,450.00</td>
+      <td class="ref">WFCT0ZHLK28B</td>
+    </tr>
+<tr class="chg">
+      <td class="rownum">36</td>
+      <td class="date">11/18/2025</td>
+      <td class="desc">Rent due — week of November 18, 2025</td>
+      <td class="num debit">$425.00</td>
+      <td class="num credit"></td>
+      <td class="num bal">$5,875.00</td>
+      <td class="ref"></td>
+    </tr>
+<tr class="chg">
+      <td class="rownum">37</td>
+      <td class="date">11/25/2025</td>
+      <td class="desc">Rent due — week of November 25, 2025</td>
+      <td class="num debit">$425.00</td>
+      <td class="num credit"></td>
+      <td class="num bal">$6,300.00</td>
+      <td class="ref"></td>
+    </tr>
+<tr class="chg">
+      <td class="rownum">38</td>
+      <td class="date">12/02/2025</td>
+      <td class="desc">Rent due — week of December 2, 2025</td>
+      <td class="num debit">$425.00</td>
+      <td class="num credit"></td>
+      <td class="num bal">$6,725.00</td>
+      <td class="ref"></td>
+    </tr>
+<tr class="chg">
+      <td class="rownum">39</td>
+      <td class="date">12/09/2025</td>
+      <td class="desc">Rent due — week of December 9, 2025</td>
+      <td class="num debit">$425.00</td>
+      <td class="num credit"></td>
+      <td class="num bal">$7,150.00</td>
+      <td class="ref"></td>
+    </tr>
+<tr class="pay">
+      <td class="rownum">40</td>
+      <td class="date">12/09/2025</td>
+      <td class="desc">Payment — Zelle from VLADIMIR FLOROV</td>
+      <td class="num debit"></td>
+      <td class="num credit">$400.00</td>
+      <td class="num bal">$6,750.00</td>
+      <td class="ref">WFCT0ZKX2YV4</td>
+    </tr>
+<tr class="chg">
+      <td class="rownum">41</td>
+      <td class="date">12/16/2025</td>
+      <td class="desc">Rent due — week of December 16, 2025</td>
+      <td class="num debit">$425.00</td>
+      <td class="num credit"></td>
+      <td class="num bal">$7,175.00</td>
+      <td class="ref"></td>
+    </tr>
+<tr class="chg">
+      <td class="rownum">42</td>
+      <td class="date">12/23/2025</td>
+      <td class="desc">Rent due — week of December 23, 2025</td>
+      <td class="num debit">$425.00</td>
+      <td class="num credit"></td>
+      <td class="num bal">$7,600.00</td>
+      <td class="ref"></td>
+    </tr>
+<tr class="pay">
+      <td class="rownum">43</td>
+      <td class="date">12/26/2025</td>
+      <td class="desc">Payment — Zelle from VLADIMIR FLOROV</td>
+      <td class="num debit"></td>
+      <td class="num credit">$425.00</td>
+      <td class="num bal">$7,175.00</td>
+      <td class="ref">WFCT0ZMPJR62</td>
+    </tr>
+<tr class="chg">
+      <td class="rownum">44</td>
+      <td class="date">12/30/2025</td>
+      <td class="desc">Rent due — week of December 30, 2025</td>
+      <td class="num debit">$425.00</td>
+      <td class="num credit"></td>
+      <td class="num bal">$7,600.00</td>
+      <td class="ref"></td>
+    </tr>
+<tr class="pay">
+      <td class="rownum">45</td>
+      <td class="date">01/02/2026</td>
+      <td class="desc">Payment — Zelle from DANILA FLOROV</td>
+      <td class="num debit"></td>
+      <td class="num credit">$425.00</td>
+      <td class="num bal">$7,175.00</td>
+      <td class="ref">WFCT0ZND7DPT</td>
+    </tr>
+<tr class="chg">
+      <td class="rownum">46</td>
+      <td class="date">01/06/2026</td>
+      <td class="desc">Rent due — week of January 6, 2026</td>
+      <td class="num debit">$425.00</td>
+      <td class="num credit"></td>
+      <td class="num bal">$7,600.00</td>
+      <td class="ref"></td>
+    </tr>
+<tr class="pay">
+      <td class="rownum">47</td>
+      <td class="date">01/12/2026</td>
+      <td class="desc">Payment — Zelle from DANILA FLOROV</td>
+      <td class="num debit"></td>
+      <td class="num credit">$450.00</td>
+      <td class="num bal">$7,150.00</td>
+      <td class="ref">WFCT0ZPD62CH</td>
+    </tr>
+<tr class="chg">
+      <td class="rownum">48</td>
+      <td class="date">01/13/2026</td>
+      <td class="desc">Rent due — week of January 13, 2026</td>
+      <td class="num debit">$425.00</td>
+      <td class="num credit"></td>
+      <td class="num bal">$7,575.00</td>
+      <td class="ref"></td>
+    </tr>
+<tr class="chg">
+      <td class="rownum">49</td>
+      <td class="date">01/20/2026</td>
+      <td class="desc">Rent due — week of January 20, 2026</td>
+      <td class="num debit">$425.00</td>
+      <td class="num credit"></td>
+      <td class="num bal">$8,000.00</td>
+      <td class="ref"></td>
+    </tr>
+<tr class="pay">
+      <td class="rownum">50</td>
+      <td class="date">01/20/2026</td>
+      <td class="desc">Payment — Zelle from VLADIMIR FLOROV</td>
+      <td class="num debit"></td>
+      <td class="num credit">$425.00</td>
+      <td class="num bal">$7,575.00</td>
+      <td class="ref">WFCT0ZQ65DM5</td>
+    </tr>
+<tr class="pay">
+      <td class="rownum">51</td>
+      <td class="date">01/26/2026</td>
+      <td class="desc">Payment — Zelle from VLADIMIR FLOROV</td>
+      <td class="num debit"></td>
+      <td class="num credit">$425.00</td>
+      <td class="num bal">$7,150.00</td>
+      <td class="ref">WFCT0ZQT2RBJ</td>
+    </tr>
+<tr class="chg">
+      <td class="rownum">52</td>
+      <td class="date">01/27/2026</td>
+      <td class="desc">Rent due — week of January 27, 2026</td>
+      <td class="num debit">$425.00</td>
+      <td class="num credit"></td>
+      <td class="num bal">$7,575.00</td>
+      <td class="ref"></td>
+    </tr>
+<tr class="pay">
+      <td class="rownum">53</td>
+      <td class="date">02/02/2026</td>
+      <td class="desc">Payment — Zelle from DANILA FLOROV</td>
+      <td class="num debit"></td>
+      <td class="num credit">$425.00</td>
+      <td class="num bal">$7,150.00</td>
+      <td class="ref">WFCT0ZRMFY4Z</td>
+    </tr>
+<tr class="chg">
+      <td class="rownum">54</td>
+      <td class="date">02/03/2026</td>
+      <td class="desc">Rent due — week of February 3, 2026</td>
+      <td class="num debit">$425.00</td>
+      <td class="num credit"></td>
+      <td class="num bal">$7,575.00</td>
+      <td class="ref"></td>
+    </tr>
+<tr class="chg">
+      <td class="rownum">55</td>
+      <td class="date">02/10/2026</td>
+      <td class="desc">Rent due — week of February 10, 2026</td>
+      <td class="num debit">$425.00</td>
+      <td class="num credit"></td>
+      <td class="num bal">$8,000.00</td>
+      <td class="ref"></td>
+    </tr>
+<tr class="pay">
+      <td class="rownum">56</td>
+      <td class="date">02/10/2026</td>
+      <td class="desc">Payment — Zelle from VLADIMIR FLOROV</td>
+      <td class="num debit"></td>
+      <td class="num credit">$425.00</td>
+      <td class="num bal">$7,575.00</td>
+      <td class="ref">WFCT0ZSHY3Q7</td>
+    </tr>
+<tr class="chg">
+      <td class="rownum">57</td>
+      <td class="date">02/17/2026</td>
+      <td class="desc">Rent due — week of February 17, 2026</td>
+      <td class="num debit">$425.00</td>
+      <td class="num credit"></td>
+      <td class="num bal">$8,000.00</td>
+      <td class="ref"></td>
+    </tr>
+<tr class="chg">
+      <td class="rownum">58</td>
+      <td class="date">02/24/2026</td>
+      <td class="desc">Rent due — week of February 24, 2026</td>
+      <td class="num debit">$425.00</td>
+      <td class="num credit"></td>
+      <td class="num bal">$8,425.00</td>
+      <td class="ref"></td>
+    </tr>
+<tr class="pay">
+      <td class="rownum">59</td>
+      <td class="date">03/02/2026</td>
+      <td class="desc">Payment — Zelle from VLADIMIR FLOROV</td>
+      <td class="num debit"></td>
+      <td class="num credit">$425.00</td>
+      <td class="num bal">$8,000.00</td>
+      <td class="ref">WFCT0ZVDYZ8R</td>
+    </tr>
+<tr class="chg">
+      <td class="rownum">60</td>
+      <td class="date">03/03/2026</td>
+      <td class="desc">Rent due — week of March 3, 2026</td>
+      <td class="num debit">$425.00</td>
+      <td class="num credit"></td>
+      <td class="num bal">$8,425.00</td>
+      <td class="ref"></td>
+    </tr>
+<tr class="pay">
+      <td class="rownum">61</td>
+      <td class="date">03/06/2026</td>
+      <td class="desc">Payment — Zelle from DANILA FLOROV</td>
+      <td class="num debit"></td>
+      <td class="num credit">$425.00</td>
+      <td class="num bal">$8,000.00</td>
+      <td class="ref">WFCT0ZW553TH</td>
+    </tr>
+<tr class="chg">
+      <td class="rownum">62</td>
+      <td class="date">03/10/2026</td>
+      <td class="desc">Rent due — week of March 10, 2026</td>
+      <td class="num debit">$425.00</td>
+      <td class="num credit"></td>
+      <td class="num bal">$8,425.00</td>
+      <td class="ref"></td>
+    </tr>
+<tr class="pay">
+      <td class="rownum">63</td>
+      <td class="date">03/16/2026</td>
+      <td class="desc">Payment — Zelle from DANILA FLOROV</td>
+      <td class="num debit"></td>
+      <td class="num credit">$425.00</td>
+      <td class="num bal">$8,000.00</td>
+      <td class="ref">WFCT0ZX6NHYV</td>
+    </tr>
+<tr class="chg">
+      <td class="rownum">64</td>
+      <td class="date">03/17/2026</td>
+      <td class="desc">Rent due — week of March 17, 2026</td>
+      <td class="num debit">$425.00</td>
+      <td class="num credit"></td>
+      <td class="num bal">$8,425.00</td>
+      <td class="ref"></td>
+    </tr>
+<tr class="pay">
+      <td class="rownum">65</td>
+      <td class="date">03/23/2026</td>
+      <td class="desc">Payment — Zelle from VLADIMIR FLOROV</td>
+      <td class="num debit"></td>
+      <td class="num credit">$425.00</td>
+      <td class="num bal">$8,000.00</td>
+      <td class="ref">WFCT0ZXXNQR8</td>
+    </tr>
+<tr class="chg">
+      <td class="rownum">66</td>
+      <td class="date">03/24/2026</td>
+      <td class="desc">Rent due — week of March 24, 2026</td>
+      <td class="num debit">$425.00</td>
+      <td class="num credit"></td>
+      <td class="num bal">$8,425.00</td>
+      <td class="ref"></td>
+    </tr>
+<tr class="pay">
+      <td class="rownum">67</td>
+      <td class="date">03/30/2026</td>
+      <td class="desc">Payment — Zelle from VLADIMIR FLOROV</td>
+      <td class="num debit"></td>
+      <td class="num credit">$425.00</td>
+      <td class="num bal">$8,000.00</td>
+      <td class="ref">WFCT0ZYSR97K</td>
+    </tr>
+<tr class="chg">
+      <td class="rownum">68</td>
+      <td class="date">03/31/2026</td>
+      <td class="desc">Rent due — week of March 31, 2026</td>
+      <td class="num debit">$425.00</td>
+      <td class="num credit"></td>
+      <td class="num bal">$8,425.00</td>
+      <td class="ref"></td>
+    </tr>
+<tr class="pay">
+      <td class="rownum">69</td>
+      <td class="date">04/06/2026</td>
+      <td class="desc">Payment — Zelle from DANILA FLOROV</td>
+      <td class="num debit"></td>
+      <td class="num credit">$425.00</td>
+      <td class="num bal">$8,000.00</td>
+      <td class="ref">WFCT0ZZQ8P22</td>
+    </tr>
+<tr class="chg">
+      <td class="rownum">70</td>
+      <td class="date">04/07/2026</td>
+      <td class="desc">Rent due — week of April 7, 2026</td>
+      <td class="num debit">$425.00</td>
+      <td class="num credit"></td>
+      <td class="num bal">$8,425.00</td>
+      <td class="ref"></td>
+    </tr>
+<tr class="chg">
+      <td class="rownum">71</td>
+      <td class="date">04/14/2026</td>
+      <td class="desc">Rent due — week of April 14, 2026</td>
+      <td class="num debit">$425.00</td>
+      <td class="num credit"></td>
+      <td class="num bal">$8,850.00</td>
+      <td class="ref"></td>
+    </tr>
+<tr class="pay">
+      <td class="rownum">72</td>
+      <td class="date">04/16/2026</td>
+      <td class="desc">Payment — Zelle from DANILA FLOROV</td>
+      <td class="num debit"></td>
+      <td class="num credit">$425.00</td>
+      <td class="num bal">$8,425.00</td>
+      <td class="ref">WFCT122RKFKY</td>
+    </tr>
+<tr class="chg">
+      <td class="rownum">73</td>
+      <td class="date">04/21/2026</td>
+      <td class="desc">Rent due — week of April 21, 2026</td>
+      <td class="num debit">$425.00</td>
+      <td class="num credit"></td>
+      <td class="num bal">$8,850.00</td>
+      <td class="ref"></td>
+    </tr>
+<tr class="chg">
+      <td class="rownum">74</td>
+      <td class="date">04/28/2026</td>
+      <td class="desc">Rent due — week of April 28, 2026</td>
+      <td class="num debit">$425.00</td>
+      <td class="num credit"></td>
+      <td class="num bal">$9,275.00</td>
+      <td class="ref"></td>
+    </tr>
+<tr class="pay">
+      <td class="rownum">75</td>
+      <td class="date">05/04/2026</td>
+      <td class="desc">Payment — Zelle from VLADIMIR FLOROV</td>
+      <td class="num debit"></td>
+      <td class="num credit">$850.00</td>
+      <td class="num bal">$8,425.00</td>
+      <td class="ref">WFCT124WMKPC</td>
+    </tr>
+<tr class="chg">
+      <td class="rownum">76</td>
+      <td class="date">05/05/2026</td>
+      <td class="desc">Rent due — week of May 5, 2026</td>
+      <td class="num debit">$425.00</td>
+      <td class="num credit"></td>
+      <td class="num bal">$8,850.00</td>
+      <td class="ref"></td>
+    </tr>
+<tr class="chg">
+      <td class="rownum">77</td>
+      <td class="date">05/12/2026</td>
+      <td class="desc">Rent due — week of May 12, 2026</td>
+      <td class="num debit">$425.00</td>
+      <td class="num credit"></td>
+      <td class="num bal">$9,275.00</td>
+      <td class="ref"></td>
+    </tr>
+<tr class="chg">
+      <td class="rownum">78</td>
+      <td class="date">05/19/2026</td>
+      <td class="desc">Rent due — week of May 19, 2026</td>
+      <td class="num debit">$425.00</td>
+      <td class="num credit"></td>
+      <td class="num bal">$9,700.00</td>
+      <td class="ref"></td>
+    </tr>
+<tr class="pay">
+      <td class="rownum">79</td>
+      <td class="date">05/19/2026</td>
+      <td class="desc">Payment — Zelle from VLADIMIR FLOROV</td>
+      <td class="num debit"></td>
+      <td class="num credit">$425.00</td>
+      <td class="num bal">$9,275.00</td>
+      <td class="ref">WFCT126JW5BH</td>
+    </tr>
+<tr class="chg">
+      <td class="rownum">80</td>
+      <td class="date">05/26/2026</td>
+      <td class="desc">Rent due — week of May 26, 2026</td>
+      <td class="num debit">$425.00</td>
+      <td class="num credit"></td>
+      <td class="num bal">$9,700.00</td>
+      <td class="ref"></td>
+    </tr>
+<tr class="chg">
+      <td class="rownum">81</td>
+      <td class="date">06/02/2026</td>
+      <td class="desc">Rent due — week of June 2, 2026</td>
+      <td class="num debit">$425.00</td>
+      <td class="num credit"></td>
+      <td class="num bal">$10,125.00</td>
+      <td class="ref"></td>
+    </tr>
+<tr class="chg">
+      <td class="rownum">82</td>
+      <td class="date">06/09/2026</td>
+      <td class="desc">Rent due — week of June 9, 2026</td>
+      <td class="num debit">$425.00</td>
+      <td class="num credit"></td>
+      <td class="num bal">$10,550.00</td>
+      <td class="ref"></td>
+    </tr>
+<tr class="pay">
+      <td class="rownum">83</td>
+      <td class="date">06/09/2026</td>
+      <td class="desc">Payment — Zelle from VLADIMIR FLOROV</td>
+      <td class="num debit"></td>
+      <td class="num credit">$850.00</td>
+      <td class="num bal">$9,700.00</td>
+      <td class="ref">WFCT128YNZ29</td>
+    </tr>
+<tr class="chg">
+      <td class="rownum">84</td>
+      <td class="date">06/16/2026</td>
+      <td class="desc">Rent due — week of June 16, 2026</td>
+      <td class="num debit">$425.00</td>
+      <td class="num credit"></td>
+      <td class="num bal">$10,125.00</td>
+      <td class="ref"></td>
+    </tr>
+<tr class="chg">
+      <td class="rownum">85</td>
+      <td class="date">06/23/2026</td>
+      <td class="desc">Rent due — week of June 23, 2026</td>
+      <td class="num debit">$425.00</td>
+      <td class="num credit"></td>
+      <td class="num bal">$10,550.00</td>
+      <td class="ref"></td>
+    </tr>
+<tr class="pay">
+      <td class="rownum">86</td>
+      <td class="date">06/23/2026</td>
+      <td class="desc">Payment — Zelle from VLADIMIR FLOROV</td>
+      <td class="num debit"></td>
+      <td class="num credit">$850.00</td>
+      <td class="num bal">$9,700.00</td>
+      <td class="ref">WFCT12BK855W</td>
+    </tr>
+<tr class="chg">
+      <td class="rownum">87</td>
+      <td class="date">06/30/2026</td>
+      <td class="desc">Rent due — week of June 30, 2026</td>
+      <td class="num debit">$425.00</td>
+      <td class="num credit"></td>
+      <td class="num bal">$10,125.00</td>
+      <td class="ref"></td>
+    </tr>
+<tr class="pay">
+      <td class="rownum">88</td>
+      <td class="date">07/06/2026</td>
+      <td class="desc">Payment — Zelle from VLADIMIR FLOROV</td>
+      <td class="num debit"></td>
+      <td class="num credit">$850.00</td>
+      <td class="num bal">$9,275.00</td>
+      <td class="ref">WFCT12D6BZ47</td>
+    </tr>
+<tr class="chg">
+      <td class="rownum">89</td>
+      <td class="date">07/07/2026</td>
+      <td class="desc">Rent due — week of July 7, 2026</td>
+      <td class="num debit">$425.00</td>
+      <td class="num credit"></td>
+      <td class="num bal">$9,700.00</td>
+      <td class="ref"></td>
+    </tr>
+<tr class="chg">
+      <td class="rownum">90</td>
+      <td class="date">07/14/2026</td>
+      <td class="desc">Rent due — week of July 14, 2026</td>
+      <td class="num debit">$425.00</td>
+      <td class="num credit"></td>
+      <td class="num bal">$10,125.00</td>
+      <td class="ref"></td>
+    </tr>
+<tr class="pay">
+      <td class="rownum">91</td>
+      <td class="date">07/20/2026</td>
+      <td class="desc">Payment — Zelle from VLADIMIR FLOROV</td>
+      <td class="num debit"></td>
+      <td class="num credit">$450.00</td>
+      <td class="num bal">$9,675.00</td>
+      <td class="ref">WFCT22FRK3P9</td>
+    </tr>
+<tr class="chg">
+      <td class="rownum">92</td>
+      <td class="date">07/21/2026</td>
+      <td class="desc">Rent due — week of July 21, 2026</td>
+      <td class="num debit">$425.00</td>
+      <td class="num credit"></td>
+      <td class="num bal">$10,100.00</td>
+      <td class="ref"></td>
+    </tr>
+<tr class="chg">
+      <td class="rownum">93</td>
+      <td class="date">07/28/2026</td>
+      <td class="desc">Rent due — week of July 28, 2026</td>
+      <td class="num debit">$425.00</td>
+      <td class="num credit"></td>
+      <td class="num bal">$10,525.00</td>
+      <td class="ref"></td>
+    </tr>
+<tr class="chg">
+      <td class="rownum">94</td>
+      <td class="date">08/04/2026</td>
+      <td class="desc">Rent due — week of August 4, 2026</td>
+      <td class="num debit">$425.00</td>
+      <td class="num credit"></td>
+      <td class="num bal">$10,950.00</td>
+      <td class="ref"></td>
+    </tr>
+<tr class="pay">
+      <td class="rownum">95</td>
+      <td class="date">08/04/2026</td>
+      <td class="desc">Payment — Zelle from VLADIMIR FLOROV</td>
+      <td class="num debit"></td>
+      <td class="num credit">$450.00</td>
+      <td class="num bal">$10,500.00</td>
+      <td class="ref">WFCT22HGF72J</td>
+    </tr>
+<tr class="chg">
+      <td class="rownum">96</td>
+      <td class="date">08/11/2026</td>
+      <td class="desc">Rent due — week of August 11, 2026</td>
+      <td class="num debit">$425.00</td>
+      <td class="num credit"></td>
+      <td class="num bal">$10,925.00</td>
+      <td class="ref"></td>
+    </tr>
+<tr class="pay">
+      <td class="rownum">97</td>
+      <td class="date">08/11/2026</td>
+      <td class="desc">Payment — Zelle from VLADIMIR FLOROV</td>
+      <td class="num debit"></td>
+      <td class="num credit">$425.00</td>
+      <td class="num bal">$10,500.00</td>
+      <td class="ref">WFCT22J8HNBL</td>
+    </tr>
+<tr class="pay">
+      <td class="rownum">98</td>
+      <td class="date">08/17/2026</td>
+      <td class="desc">Payment — Zelle from VLADIMIR FLOROV</td>
+      <td class="num debit"></td>
+      <td class="num credit">$425.00</td>
+      <td class="num bal">$10,075.00</td>
+      <td class="ref">WFCT22JXFGF4</td>
+    </tr>
+<tr class="chg">
+      <td class="rownum">99</td>
+      <td class="date">08/18/2026</td>
+      <td class="desc">Rent due — week of August 18, 2026</td>
+      <td class="num debit">$425.00</td>
+      <td class="num credit"></td>
+      <td class="num bal">$10,500.00</td>
+      <td class="ref"></td>
+    </tr>
+<tr class="chg">
+      <td class="rownum">100</td>
+      <td class="date">08/25/2026</td>
+      <td class="desc">Rent due — week of August 25, 2026</td>
+      <td class="num debit">$425.00</td>
+      <td class="num credit"></td>
+      <td class="num bal">$10,925.00</td>
+      <td class="ref"></td>
+    </tr>
+<tr class="pay">
+      <td class="rownum">101</td>
+      <td class="date">08/27/2026</td>
+      <td class="desc">Payment — Zelle from VLADIMIR FLOROV</td>
+      <td class="num debit"></td>
+      <td class="num credit">$425.00</td>
+      <td class="num bal">$10,500.00</td>
+      <td class="ref">WFCT22L3L55J</td>
+    </tr>
+<tr class="chg">
+      <td class="rownum">102</td>
+      <td class="date">09/01/2026</td>
+      <td class="desc">Rent due — week of September 1, 2026</td>
+      <td class="num debit">$425.00</td>
+      <td class="num credit"></td>
+      <td class="num bal">$10,925.00</td>
+      <td class="ref"></td>
+    </tr>
+<tr class="pay">
+      <td class="rownum">103</td>
+      <td class="date">09/01/2026</td>
+      <td class="desc">Payment — Zelle from VLADIMIR FLOROV</td>
+      <td class="num debit"></td>
+      <td class="num credit">$425.00</td>
+      <td class="num bal">$10,500.00</td>
+      <td class="ref">WFCT22LQKWRP</td>
+    </tr>
+<tr class="totals">
+      <td class="rownum">104</td>
+      <td></td><td>TOTALS</td>
+      <td class="num">$26,350.00</td>
+      <td class="num">$15,850.00</td>
+      <td class="num bal">$10,500.00</td>
+      <td></td>
+    </tr>
+<tr class="spacer"><td class="rownum">105</td><td colspan="6"></td></tr>
+<tr class="note">
+      <td class="rownum">106</td>
+      <td class="k">Note 1</td>
+      <td class="v" colspan="5">Rent accrues at $425.00 per week, one charge every seven days beginning July 1, 2025. Only whole weeks already fallen due are charged — a part week is never accrued, so no proration appears in this ledger.</td>
+    </tr>
+<tr class="note">
+      <td class="rownum">107</td>
+      <td class="k">Note 2</td>
+      <td class="v" colspan="5">Payments are the actual Zelle deposits credited to U.S. Bank checking account ····8247, taken from the export Checking - 8247_07-01-2025_09-06-2026.csv. Each row corresponds to one row of that export; nothing is estimated.</td>
+    </tr>
+<tr class="note">
+      <td class="rownum">108</td>
+      <td class="k">Note 3</td>
+      <td class="v" colspan="5">Balance Due is a running total: charges less payments as at each row. A negative figure means payments had, at that date, run ahead of the rent accrued.</td>
+    </tr>
+<tr class="note">
+      <td class="rownum">109</td>
+      <td class="k">Note 4</td>
+      <td class="v" colspan="5">A further 7 deposits totalling $375.00 were received for cleaning, a service charged separately from rent. They are excluded from this ledger and nothing is outstanding on that account.</td>
+    </tr>
+<tr class="note">
+      <td class="rownum">110</td>
+      <td class="k">Note 5</td>
+      <td class="v" colspan="5">This ledger is an informational compilation prepared from the bank export named above; it does not replace the primary bank statements.</td>
+    </tr>
+    </tbody>
+  </table>
+</div>
+
+<script>
+  document.getElementById('print').addEventListener('click', function () { window.print(); });
+</script>
+</body>
+</html>
