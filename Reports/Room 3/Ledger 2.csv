@@ -108,3 +108,14 @@
 "Note 3","Balance Due is a running total: charges less payments as at each row. A negative figure means payments had, at that date, run ahead of the rent accrued.",,,,
 "Note 4","A further 7 deposits totalling $375.00 were received for cleaning, a service charged separately from rent. They are excluded from this ledger and nothing is outstanding on that account.",,,,
 "Note 5","This ledger is an informational compilation prepared from the bank export named above; it does not replace the primary bank statements.",,,,
+
+"CLEANING PAYMENTS","charged separately from rent — paid in full",,,,
+"Date","Sender","Amount","Reference","Nature of payment",""
+"11/24/2025","DANILA FLOROV",25.00,"WFCT0ZJC8CM5","Cleaning service — paid in full",
+"12/22/2025","DANILA FLOROV",50.00,"WFCT0ZMB2HWV","Cleaning service — paid in full",
+"02/04/2026","DANILA FLOROV",60.00,"WFCT0ZRVWT5S","Cleaning service — paid in full",
+"03/02/2026","DANILA FLOROV",60.00,"WFCT0ZVQ6KG9","Cleaning service — paid in full",
+"04/13/2026","DANILA FLOROV",60.00,"WFCT122CH3G5","Cleaning service — paid in full",
+"05/11/2026","DANILA FLOROV",60.00,"WFCT125K73JD","Cleaning service — paid in full",
+"07/06/2026","DANILA FLOROV",60.00,"WFCT12CWL675","Cleaning service — paid in full",
+,"TOTAL",375.00,,"Nothing outstanding",
