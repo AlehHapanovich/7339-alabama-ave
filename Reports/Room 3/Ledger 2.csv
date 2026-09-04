@@ -106,7 +106,7 @@
 "Note 1","Rent accrues at $425.00 per week, one charge every seven days beginning July 1, 2025. Only whole weeks already fallen due are charged — a part week is never accrued, so no proration appears in this ledger.",,,,
 "Note 2","Payments are the actual Zelle deposits credited to U.S. Bank checking account ····8247, taken from the export Checking - 8247_07-01-2025_09-06-2026.csv. Each row corresponds to one row of that export; nothing is estimated.",,,,
 "Note 3","Balance Due is a running total: charges less payments as at each row. A negative figure means payments had, at that date, run ahead of the rent accrued.",,,,
-"Note 4","A further 7 deposits totalling $375.00 were received for cleaning, a service charged separately from rent. They are excluded from this ledger and nothing is outstanding on that account.",,,,
+"Note 4","A further 7 deposits totalling $375.00 were received for cleaning, a service charged separately from rent, against $35.00 paid out for that service in the same period — $340.00 net. Cleaning is excluded from this rent ledger and nothing is outstanding on that account; both sides are set out under CLEANING below.",,,,
 "Note 5","This ledger is an informational compilation prepared from the bank export named above; it does not replace the primary bank statements.",,,,
 
 "CLEANING PAYMENTS","charged separately from rent — paid in full",,,,
@@ -118,4 +118,10 @@
 "04/13/2026","DANILA FLOROV",60.00,"WFCT122CH3G5","Cleaning service — paid in full",
 "05/11/2026","DANILA FLOROV",60.00,"WFCT125K73JD","Cleaning service — paid in full",
 "07/06/2026","DANILA FLOROV",60.00,"WFCT12CWL675","Cleaning service — paid in full",
-,"TOTAL",375.00,,"Nothing outstanding",
+,"TOTAL RECEIVED",375.00,,"Nothing outstanding",
+
+"PAID FOR CLEANING","money spent on the service over the same period",,,,
+"Date","Paid to","Amount","Reference","Description on statement",""
+"07/27/2026","Diana Cleaning Alabama $25",35.00,"USBCsRBsqPnM","ZELLE INSTANT PMT TO Diana Cleaning Alabama $25 USBCsRBsqPnM",
+,"TOTAL PAID",35.00,,,
+,"NET (received less paid)",340.00,,,
