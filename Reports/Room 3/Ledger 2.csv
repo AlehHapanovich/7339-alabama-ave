@@ -1,9 +1,9 @@
 ﻿"RENT LEDGER","Room A — weekly tenancy",,,,
 "Tenants","VLADIMIR FLOROV, DANILA FLOROV",,,,
 "Rent rate","$425.00 per week",,,,
-"Ledger period","July 1, 2025 through September 3, 2026",,,,
+"Ledger period","July 1, 2025 through September 8, 2026",,,,
 "Deposit account","U.S. Bank Checking ····8247",,,,
-"Prepared","September 3, 2026",,,,
+"Prepared","September 8, 2026",,,,
 
 "Date","Description","Debit (Charge)","Credit (Payment)","Balance Due","Reference"
 "07/01/2025","Rent due — week of July 1, 2025",425.00,,425.00,""
@@ -101,7 +101,8 @@
 "08/27/2026","Payment — Zelle from VLADIMIR FLOROV",,425.00,10500.00,"WFCT22L3L55J"
 "09/01/2026","Rent due — week of September 1, 2026",425.00,,10925.00,""
 "09/01/2026","Payment — Zelle from VLADIMIR FLOROV",,425.00,10500.00,"WFCT22LQKWRP"
-,"TOTALS",26350.00,15850.00,10500.00,
+"09/08/2026","Rent due — week of September 8, 2026",425.00,,10925.00,""
+,"TOTALS",26775.00,15850.00,10925.00,
 
 "Note 1","Rent accrues at $425.00 per week, one charge every seven days beginning July 1, 2025. Only whole weeks already fallen due are charged — a part week is never accrued, so no proration appears in this ledger.",,,,
 "Note 2","Payments are the actual Zelle deposits credited to U.S. Bank checking account ····8247, taken from the export Checking - 8247_07-01-2025_09-06-2026.csv. Each row corresponds to one row of that export; nothing is estimated.",,,,
