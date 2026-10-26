@@ -1,5 +1,5 @@
 (function () {
-  const PHOTO_COUNT = 13;
+  const PHOTO_COUNT = 12;
   const photos = Array.from({ length: PHOTO_COUNT }, (_, i) =>
     `images/New/best/main-${String(i + 1).padStart(2, "0")}.jpg`
   );
