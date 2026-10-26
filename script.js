@@ -1,10 +1,10 @@
 (function () {
-  const PHOTO_COUNT = 12;
+  const PHOTO_COUNT = 21;
   const photos = Array.from({ length: PHOTO_COUNT }, (_, i) =>
     `images/New/best/main-${String(i + 1).padStart(2, "0")}.jpg`
   );
 
-  const ADU_PHOTO_COUNT = 4;
+  const ADU_PHOTO_COUNT = 5;
   const aduPhotos = Array.from({ length: ADU_PHOTO_COUNT }, (_, i) =>
     `images/New/best/adu-${String(i + 1).padStart(2, "0")}.jpg`
   );
